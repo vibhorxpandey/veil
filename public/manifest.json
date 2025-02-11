@@ -1,0 +1,13 @@
+{
+  "name": "Veil Research",
+  "short_name": "Veil",
+  "description": "Research AI Platform — train models and read papers in one flow.",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#050508",
+  "theme_color": "#8b5cf6",
+  "icons": [
+    { "src": "/logo-transparent.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/logo-transparent.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

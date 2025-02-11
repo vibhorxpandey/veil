@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Veil — Record</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#02020a;width:1280px;height:720px;overflow:hidden;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Inter",sans-serif;
+  color:#ededff;position:relative;}
+#bg{position:fixed;inset:0;z-index:0;}
+#vig{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 50%,transparent 30%,rgba(2,2,10,.75) 100%);}
+#stage{position:absolute;inset:0;z-index:2;}
+.sc{position:absolute;inset:0;display:flex;align-items:center;
+  justify-content:center;opacity:0;pointer-events:none;padding:56px 64px;}
+#prog{position:fixed;bottom:0;left:0;height:3px;width:0%;z-index:50;
+  background:linear-gradient(90deg,#8b5cf6,#3b82f6);
+  box-shadow:0 0 10px rgba(139,92,246,.8);}
+.display{font-size:80px;font-weight:900;letter-spacing:-.055em;line-height:1.02;}
+.heading{font-size:52px;font-weight:800;letter-spacing:-.04em;line-height:1.08;}
+.subhead{font-size:36px;font-weight:700;letter-spacing:-.03em;line-height:1.12;}
+.body{font-size:17px;color:#7878a8;line-height:1.78;}
+.label{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:#8b5cf6;display:flex;align-items:center;gap:8px;}
+.label::before{content:'';width:6px;height:6px;border-radius:50%;background:#8b5cf6;
+  animation:dpulse 2s ease-in-out infinite;display:inline-block;}
+@keyframes dpulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.35;transform:scale(.65);}}
+.grad{background:linear-gradient(130deg,#c4b5fd 0%,#93c5fd 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.grad-r{background:linear-gradient(130deg,#fda4af 0%,#fb923c 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.tw{position:absolute;background:rgba(8,8,18,.96);
+  border:1px solid rgba(255,255,255,.1);border-radius:12px;
+  padding:14px 18px;min-width:200px;box-shadow:0 20px 60px rgba(0,0,0,.7);}
+.twbar{display:flex;gap:5px;margin-bottom:10px;}
+.twd{width:10px;height:10px;border-radius:50%;}
+.twn{font-size:11.5px;font-weight:700;color:#7878a8;margin-bottom:5px;}
+.twl{font-size:10.5px;color:rgba(120,120,168,.6);line-height:1.6;}
+.mc{background:rgba(10,10,22,.9);border:1px solid rgba(255,255,255,.07);
+  border-radius:18px;padding:26px 22px;flex:1;}
+.pill{display:flex;align-items:flex-start;gap:14px;padding:16px 20px;
+  border-radius:14px;background:rgba(10,10,22,.9);
+  border:1px solid rgba(255,255,255,.07);width:100%;}
+.term{background:rgba(4,4,12,.98);border:1px solid rgba(255,255,255,.07);
+  border-radius:14px;padding:20px 24px;
+  font-family:'SF Mono','Fira Code','Consolas',monospace;
+  font-size:12.5px;line-height:1.9;}
+.tcur{display:inline-block;width:7px;height:13px;background:#8b5cf6;
+  vertical-align:middle;animation:blink 1s step-end infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+.snum{font-size:44px;font-weight:900;letter-spacing:-.04em;
+  background:linear-gradient(130deg,#f87171,#fb923c);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+<div id="vig"></div>
+<div id="stage">
+
+<div class="sc" id="sc0">
+  <div style="text-align:center;">
+    <div id="c0" style="font-size:22px;color:#7878a8;font-family:'SF Mono',monospace;letter-spacing:.04em;">
+      <span id="c0t"></span><span class="tcur"></span>
+    </div>
+  </div>
+</div>
+
+<div class="sc" id="sc1" style="flex-direction:column;gap:0;">
+  <div style="text-align:center;position:relative;z-index:2;margin-bottom:36px;">
+    <div class="label" id="lb1" style="justify-content:center;opacity:0;margin-bottom:14px;">The Problem</div>
+    <div class="heading" id="h1" style="opacity:0;transform:translateY(22px);">Researchers live across<br/><span class="grad-r">5 broken tools.</span></div>
+  </div>
+  <div id="wins" style="position:relative;width:880px;height:220px;">
+    <div class="tw" id="tw0" style="top:0;left:0;opacity:0;transform:rotate(-3deg);">
+      <div class="twbar"><div class="twd" style="background:#ff5f57"></div><div class="twd" style="background:#febc2e"></div><div class="twd" style="background:#28c840"></div></div>
+      <div class="twn">📄 ArXiv — Papers</div><div class="twl">Attention is all you need...<br/>Transformer, BERT, GPT-4...</div>
+    </div>
+    <div class="tw" id="tw1" style="top:-8px;left:210px;opacity:0;transform:rotate(2.5deg);">
+      <div class="twbar"><div class="twd" style="background:#ff5f57"></div><div class="twd" style="background:#febc2e"></div><div class="twd" style="background:#28c840"></div></div>
+      <div class="twn">⚙️ Colab — Training</div><div class="twl">Epoch 14/100 — loss 0.312<br/>GPU: 96% utilization</div>
+    </div>
+    <div class="tw" id="tw2" style="top:-4px;left:430px;opacity:0;transform:rotate(-1.5deg);">
+      <div class="twbar"><div class="twd" style="background:#ff5f57"></div><div class="twd" style="background:#febc2e"></div><div class="twd" style="background:#28c840"></div></div>
+      <div class="twn">📊 W&amp;B — Tracking</div><div class="twl">Run #48 — val_acc: .891<br/>12 experiments running</div>
+    </div>
+    <div class="tw" id="tw3" style="top:108px;left:60px;opacity:0;transform:rotate(1.5deg);">
+      <div class="twbar"><div class="twd" style="background:#ff5f57"></div><div class="twd" style="background:#febc2e"></div><div class="twd" style="background:#28c840"></div></div>
+      <div class="twn">✍️ Notion — Writing</div><div class="twl">3. Methodology<br/>We propose a novel...</div>
+    </div>
+    <div class="tw" id="tw4" style="top:110px;left:320px;opacity:0;transform:rotate(-2deg);">
+      <div class="twbar"><div class="twd" style="background:#ff5f57"></div><div class="twd" style="background:#febc2e"></div><div class="twd" style="background:#28c840"></div></div>
+      <div class="twn">🔗 GitHub — Code</div><div class="twl">main · 3 commits ahead<br/>src/model/train.py</div>
+    </div>
+  </div>
+</div>
+
+<div class="sc" id="sc2" style="gap:56px;align-items:center;">
+  <div style="flex:1;max-width:440px;">
+    <div class="label" id="lb2" style="opacity:0;margin-bottom:16px;">The Cost</div>
+    <div class="subhead" id="h2" style="opacity:0;transform:translateY(20px);margin-bottom:16px;">Context dies.<br/><span class="grad-r">Flow shatters.</span></div>
+    <div class="body" id="b2" style="opacity:0;max-width:400px;">Every switch resets your mental state. GPU credits drain on environment setup — not science.</div>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;gap:12px;">
+    <div class="pill" id="pi0" style="opacity:0;transform:translateX(28px);border-left:3px solid #ef4444;">
+      <div style="flex-shrink:0;"><div class="snum">12+</div><div style="font-size:10px;color:#7878a8;font-weight:700;margin-top:2px;">hrs/week lost</div></div>
+      <div class="body" style="font-size:12.5px;">Hours wasted every week switching tools — before any research gets done.</div>
+    </div>
+    <div class="pill" id="pi1" style="opacity:0;transform:translateX(28px);border-left:3px solid #f59e0b;">
+      <div style="flex-shrink:0;"><div class="snum">23</div><div style="font-size:10px;color:#7878a8;font-weight:700;margin-top:2px;">min refocus</div></div>
+      <div class="body" style="font-size:12.5px;">Average time to regain deep focus after a context-breaking interruption.</div>
+    </div>
+    <div class="pill" id="pi2" style="opacity:0;transform:translateX(28px);border-left:3px solid #3b82f6;">
+      <div style="flex-shrink:0;"><div class="snum">5×</div><div style="font-size:10px;color:#7878a8;font-weight:700;margin-top:2px;">more setup</div></div>
+      <div class="body" style="font-size:12.5px;">More time spent configuring environments than running actual experiments.</div>
+    </div>
+  </div>
+</div>
+
+<div class="sc" id="sc3">
+  <div class="display grad" id="p3" style="opacity:0;transform:scale(.9);text-align:center;">There has to be<br/>a better way.</div>
+</div>
+
+<div class="sc" id="sc4">
+  <div style="text-align:center;position:relative;z-index:2;">
+    <div id="r4l" style="opacity:0;transform:scale(.55);margin-bottom:20px;">
+      <img src="/logo.png" alt="Veil" style="width:90px;height:90px;object-fit:contain;filter:drop-shadow(0 0 50px rgba(139,92,246,1))drop-shadow(0 0 100px rgba(139,92,246,.4));"/>
+    </div>
+    <div class="display grad" id="r4n" style="opacity:0;transform:translateY(18px);">Veil</div>
+    <div class="body" id="r4t" style="opacity:0;font-size:22px;color:#ededff;margin-top:14px;">The unified AI workspace for<br/>researchers and ML engineers.</div>
+    <div id="r4s" style="opacity:0;margin-top:12px;font-size:13px;color:rgba(120,120,168,.45);letter-spacing:.06em;">ONE WORKSPACE · FOUR MODES · YOUR ENTIRE RESEARCH STACK</div>
+  </div>
+</div>
+
+<div class="sc" id="sc5" style="flex-direction:column;gap:0;padding:44px 56px;">
+  <div style="text-align:center;margin-bottom:28px;">
+    <div class="label" id="lb5" style="justify-content:center;opacity:0;margin-bottom:12px;">4 Modes</div>
+    <div class="subhead" id="h5" style="opacity:0;transform:translateY(16px);">Switch modes. <span class="grad">Never drop context.</span></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;width:100%;">
+    <div class="mc" id="mc0" style="opacity:0;transform:translateY(30px);border-top:2px solid #3b82f6;">
+      <div style="font-size:28px;margin-bottom:12px;">📖</div>
+      <div style="font-size:14.5px;font-weight:700;color:#ededff;margin-bottom:7px;">Research</div>
+      <div style="font-size:11.5px;color:#7878a8;line-height:1.7;">Hypothesis framing, literature synthesis, experiment planning, GPU training &amp; manuscript drafting.</div>
+      <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:4px;">
+        <span style="padding:3px 8px;border-radius:6px;font-size:9.5px;font-weight:700;color:#3b82f6;background:rgba(59,130,246,.1);">Literature</span>
+        <span style="padding:3px 8px;border-radius:6px;font-size:9.5px;font-weight:700;color:#3b82f6;background:rgba(59,130,246,.1);">Experiments</span>
+      </div>
+    </div>
+    <div class="mc" id="mc1" style="opacity:0;transform:translateY(30px);border-top:2px solid #10b981;">
+      <div style="font-size:28px;margin-bottom:12px;">🧬</div>
+      <div style="font-size:14.5px;font-weight:700;color:#ededff;margin-bottom:7px;">Biology</div>
+      <div style="font-size:11.5px;color:#7878a8;line-height:1.7;">Protein design, genomics, pathway analysis and biomedical reasoning workflows.</div>
+      <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:4px;">
+        <span style="padding:3px 8px;border-radius:6px;font-size:9.5px;font-weight:700;color:#10b981;background:rgba(16,185,129,.1);">Protein Design</span>
+        <span style="padding:3px 8px;border-radius:6px;font-size:9.5px;font-weight:700;color:#10b981;background:rgba(16,185,129,.1);">Genomics</span>
+      </div>
+    </div>
+    <div class="mc" id="mc2" style="opacity:0;transform:translateY(30px);border-top:2px solid #f59e0b;">
+      <div style="font-size:28px;margin-bottom:12px;">🔁</div>
+      <div style="font-size:14.5px;font-weight:700;color:#ededff;margin-bottom:7px;">Flywheel</div>
+      <div style="font-size:11.5px;color:#7878a8;line-height:1.7;">Auto fine-tuning, evaluations, RLHF data collection and continuous model improvement.</div>
+      <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:4px;">
+        <span style="padding:3px 8px;border-radius:6px;font-size:9.5px;font-weight:700;color:#f59e0b;background:rgba(245,158,11,.1);">Fine-tuning</span>
+        <span style="padding:3px 8px;border-radius:6px;font-size:9.5px;font-weight:700;color:#f59e0b;background:rgba(245,158,11,.1);">Evaluations</span>
+      </div>
+    </div>
+    <div class="mc" id="mc3" style="opacity:0;transform:translateY(30px);border-top:2px solid #8b5cf6;">
+      <div style="font-size:28px;margin-bottom:12px;">✍️</div>
+      <div style="font-size:14.5px;font-weight:700;color:#ededff;margin-bottom:7px;">Write</div>
+      <div style="font-size:11.5px;color:#7878a8;line-height:1.7;">Rough notes to publication-ready output — structured arguments, verified citations &amp; LaTeX.</div>
+      <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:4px;">
+        <span style="padding:3px 8px;border-radius:6px;font-size:9.5px;font-weight:700;color:#8b5cf6;background:rgba(139,92,246,.1);">LaTeX</span>
+        <span style="padding:3px 8px;border-radius:6px;font-size:9.5px;font-weight:700;color:#8b5cf6;background:rgba(139,92,246,.1);">Citations</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sc" id="sc6" style="gap:52px;align-items:center;">
+  <div style="flex:1;">
+    <div class="label" id="lb6" style="opacity:0;margin-bottom:14px;">Seamless</div>
+    <div class="subhead" id="h6" style="opacity:0;transform:translateY(16px);text-align:left;margin-bottom:14px;">One session.<br/><span class="grad">Zero context lost.</span></div>
+    <div class="body" id="b6" style="opacity:0;max-width:340px;">Read a paper, fine-tune a model, draft the manuscript — all without leaving Veil or losing a token of context.</div>
+  </div>
+  <div class="term" id="trm" style="flex:1;opacity:0;">
+    <div style="display:flex;gap:6px;margin-bottom:14px;">
+      <div style="width:12px;height:12px;border-radius:50%;background:#ff5f57;"></div>
+      <div style="width:12px;height:12px;border-radius:50%;background:#febc2e;"></div>
+      <div style="width:12px;height:12px;border-radius:50%;background:#28c840;"></div>
+    </div>
+    <div id="tlines"></div>
+  </div>
+</div>
+
+<div class="sc" id="sc7" style="flex-direction:column;gap:0;padding:44px 56px;">
+  <div style="text-align:center;margin-bottom:28px;">
+    <div class="label" id="lb7" style="justify-content:center;opacity:0;margin-bottom:12px;">Persistent Runtime</div>
+    <div class="subhead" id="h7" style="opacity:0;transform:translateY(16px);">Agents that <span class="grad">never stop.</span></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%;">
+    <div id="rt0" style="opacity:0;transform:translateY(26px);background:rgba(10,10,22,.9);border:1px solid rgba(255,255,255,.07);border-top:2px solid #8b5cf6;border-radius:18px;padding:28px;">
+      <div style="font-size:30px;margin-bottom:12px;">📦</div>
+      <div style="font-size:15px;font-weight:700;color:#ededff;margin-bottom:8px;">Persistent Sandboxes</div>
+      <div style="font-size:12.5px;color:#7878a8;line-height:1.7;">Isolated environments with full checkpointing. Survive disconnects — resume exactly where you left off.</div>
+    </div>
+    <div id="rt1" style="opacity:0;transform:translateY(26px);background:rgba(10,10,22,.9);border:1px solid rgba(255,255,255,.07);border-top:2px solid #3b82f6;border-radius:18px;padding:28px;">
+      <div style="font-size:30px;margin-bottom:12px;">⚡</div>
+      <div style="font-size:15px;font-weight:700;color:#ededff;margin-bottom:8px;">Elastic GPU Compute</div>
+      <div style="font-size:12.5px;color:#7878a8;line-height:1.7;">Scale from CPU to multi-GPU clusters without changing prompts, workflows, or context state.</div>
+    </div>
+    <div id="rt2" style="opacity:0;transform:translateY(26px);background:rgba(10,10,22,.9);border:1px solid rgba(255,255,255,.07);border-top:2px solid #10b981;border-radius:18px;padding:28px;">
+      <div style="font-size:30px;margin-bottom:12px;">🌙</div>
+      <div style="font-size:15px;font-weight:700;color:#ededff;margin-bottom:8px;">Works While You Sleep</div>
+      <div style="font-size:12.5px;color:#7878a8;line-height:1.7;">Queue training runs and evaluations. Morning-ready summaries delivered to your dashboard.</div>
+    </div>
+  </div>
+</div>
+
+<div class="sc" id="sc8">
+  <div style="max-width:800px;width:100%;">
+    <div class="label" id="lb8" style="justify-content:center;opacity:0;margin-bottom:22px;">Why We Built Veil</div>
+    <div id="fc" style="opacity:0;transform:translateY(22px);background:rgba(10,10,22,.92);border:1px solid rgba(139,92,246,.22);border-radius:24px;padding:44px 40px;position:relative;">
+      <div style="font-size:80px;line-height:1;color:rgba(139,92,246,.1);font-family:Georgia,serif;position:absolute;top:14px;left:26px;user-select:none;">&ldquo;</div>
+      <p style="font-size:17px;color:#ededff;line-height:1.85;margin-bottom:18px;padding-top:16px;position:relative;z-index:1;">I built Veil because I kept switching between five different tools just to do one research task — reading papers in one tab, running models in another, writing in a third. Every switch broke my flow and killed my context.</p>
+      <p style="font-size:15px;color:#7878a8;line-height:1.85;margin-bottom:28px;">Researchers and ML engineers deserve a workspace where the AI understands the <em style="color:#ededff;">entire</em> context of their work — not just the last message. That&rsquo;s what Veil is.</p>
+      <div style="display:flex;align-items:center;gap:14px;padding-top:18px;border-top:1px solid rgba(255,255,255,.06);">
+        <img src="/logo.png" alt="Veil" style="width:46px;height:46px;object-fit:contain;"/>
+        <div>
+          <div style="font-size:15px;font-weight:800;color:#ededff;">Vibhor Pandey</div>
+          <div style="font-size:12px;color:#7878a8;margin-top:3px;">Founder, Veil Research · UPES University, Dehradun</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sc" id="sc9" style="flex-direction:column;">
+  <div style="text-align:center;position:relative;z-index:2;">
+    <div id="ctabadge" style="opacity:0;display:inline-flex;align-items:center;gap:8px;padding:5px 16px;border-radius:100px;margin-bottom:26px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.28);font-size:11px;font-weight:700;color:#a78bfa;letter-spacing:.07em;">EARLY ACCESS · 2,400+ RESEARCHERS</div>
+    <div class="display" id="cta1" style="opacity:0;transform:translateY(22px);"><span class="grad">Research faster.</span></div>
+    <div class="display" id="cta2" style="opacity:0;transform:translateY(22px);color:#ededff;">Ship better models.</div>
+    <div class="body" id="ctab" style="opacity:0;margin:20px auto 36px;max-width:520px;">Join researchers running experiments, reviewing papers, and training models — all in one continuous workspace.</div>
+    <div id="ctabtn" style="opacity:0;display:inline-block;padding:16px 42px;border-radius:16px;font-size:17px;font-weight:700;color:#fff;background:linear-gradient(130deg,#8b5cf6 0%,#3b82f6 100%);box-shadow:0 0 50px rgba(139,92,246,.45);">Join Waitlist →</div>
+  </div>
+</div>
+
+</div>
+<div id="prog"></div>
+
+<script>
+/* Three.js 3D background — same as promo.html */
+;(function(){
+  const W=1280,H=720
+  const canvas=document.getElementById('bg')
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:false,alpha:true,powerPreference:'high-performance'})
+  renderer.setSize(W,H);renderer.setPixelRatio(1);renderer.setClearColor(0x02020a,1)
+  const scene=new THREE.Scene()
+  const camera=new THREE.PerspectiveCamera(60,W/H,.1,1000)
+  camera.position.set(0,0,12)
+  const starCount=600,starPos=new Float32Array(starCount*3)
+  for(let i=0;i<starCount;i++){starPos[i*3]=(Math.random()-.5)*60;starPos[i*3+1]=(Math.random()-.5)*40;starPos[i*3+2]=(Math.random()-.5)*30-10}
+  const sg=new THREE.BufferGeometry();sg.setAttribute('position',new THREE.BufferAttribute(starPos,3))
+  scene.add(new THREE.Points(sg,new THREE.PointsMaterial({color:0xffffff,size:.04,transparent:true,opacity:.35,sizeAttenuation:true})))
+  const N=70,nodePos=new Float32Array(N*3),nodeVel=new Float32Array(N*3),nodeCols=new Float32Array(N*3)
+  const PAL=[[139,92,246],[59,130,246],[16,185,129],[99,102,241]]
+  for(let i=0;i<N;i++){nodePos[i*3]=(Math.random()-.5)*22;nodePos[i*3+1]=(Math.random()-.5)*13;nodePos[i*3+2]=(Math.random()-.5)*10-2;nodeVel[i*3]=(Math.random()-.5)*.012;nodeVel[i*3+1]=(Math.random()-.5)*.012;nodeVel[i*3+2]=(Math.random()-.5)*.006;const c=PAL[i%PAL.length];nodeCols[i*3]=c[0]/255;nodeCols[i*3+1]=c[1]/255;nodeCols[i*3+2]=c[2]/255}
+  const ng=new THREE.BufferGeometry();ng.setAttribute('position',new THREE.BufferAttribute(nodePos,3));ng.setAttribute('color',new THREE.BufferAttribute(nodeCols,3))
+  scene.add(new THREE.Points(ng,new THREE.PointsMaterial({size:.18,vertexColors:true,transparent:true,opacity:.85,sizeAttenuation:true})))
+  const MAX_E=800,ep=new Float32Array(MAX_E*6),eg=new THREE.BufferGeometry()
+  eg.setAttribute('position',new THREE.BufferAttribute(ep,3))
+  const el2=new THREE.LineSegments(eg,new THREE.LineBasicMaterial({color:0x8b5cf6,transparent:true,opacity:.12}));scene.add(el2)
+  const geos=[new THREE.IcosahedronGeometry(2.5,0),new THREE.OctahedronGeometry(2,0),new THREE.TetrahedronGeometry(2.2,0),new THREE.IcosahedronGeometry(1.8,1)]
+  const scols=[0x8b5cf6,0x3b82f6,0x10b981,0x6366f1],shapes=[]
+  for(let i=0;i<6;i++){const m=new THREE.Mesh(geos[i%geos.length],new THREE.MeshBasicMaterial({color:scols[i%scols.length],wireframe:true,transparent:true,opacity:.09}));m.position.set((Math.random()-.5)*18,(Math.random()-.5)*11,-8+Math.random()*-6);m.scale.setScalar(1.2+Math.random()*1.6);m.rotation.set(Math.random()*Math.PI,Math.random()*Math.PI,0);shapes.push({mesh:m,rx:(Math.random()-.5)*.003,ry:(Math.random()-.5)*.005});scene.add(m)}
+  const gv=new THREE.Mesh(new THREE.SphereGeometry(3,16,16),new THREE.MeshBasicMaterial({color:0x8b5cf6,wireframe:true,transparent:true,opacity:.04}));gv.position.set(0,0,-4);scene.add(gv)
+  const BND={x:11,y:6.5,z:5},THR=5.5
+  function updateEdges(){let ei=0;for(let i=0;i<N&&ei<MAX_E;i++){const xi=nodePos[i*3],yi=nodePos[i*3+1],zi=nodePos[i*3+2];for(let j=i+1;j<N&&ei<MAX_E;j++){const dx=xi-nodePos[j*3],dy=yi-nodePos[j*3+1],dz=zi-nodePos[j*3+2];if(dx*dx+dy*dy+dz*dz<THR*THR){ep[ei*6]=xi;ep[ei*6+1]=yi;ep[ei*6+2]=zi;ep[ei*6+3]=nodePos[j*3];ep[ei*6+4]=nodePos[j*3+1];ep[ei*6+5]=nodePos[j*3+2];ei++}}}eg.setDrawRange(0,ei*2);eg.attributes.position.needsUpdate=true}
+  let fr=0;function anim(){requestAnimationFrame(anim);const t=Date.now()*.001;for(let i=0;i<N;i++){nodePos[i*3]+=nodeVel[i*3];nodePos[i*3+1]+=nodeVel[i*3+1];nodePos[i*3+2]+=nodeVel[i*3+2];if(Math.abs(nodePos[i*3])>BND.x)nodeVel[i*3]*=-1;if(Math.abs(nodePos[i*3+1])>BND.y)nodeVel[i*3+1]*=-1;if(Math.abs(nodePos[i*3+2])>BND.z)nodeVel[i*3+2]*=-1};ng.attributes.position.needsUpdate=true;if(fr%2===0)updateEdges();shapes.forEach(({mesh:m,rx,ry})=>{m.rotation.x+=rx;m.rotation.y+=ry});gv.rotation.x+=.001;gv.rotation.y+=.002;camera.position.x=Math.sin(t*.07)*2.5;camera.position.y=Math.cos(t*.05)*1.2;camera.lookAt(0,0,0);renderer.render(scene,camera);fr++}
+  anim()
+})()
+
+/* typewriter */
+function typeInto(el,text,spd=42){return new Promise(res=>{let i=0;el.textContent='';const iv=setInterval(()=>{el.textContent+=text[i++];if(i>=text.length){clearInterval(iv);res()}},spd)})}
+const TLINES=[{t:'veil switch --mode research',c:'#a78bfa'},{t:'✓ Context preserved (34k tokens)',c:'#4a4a6a'},{t:'✓ Literature tools loaded',c:'#4a4a6a'},{t:'→ Ready in Research mode.',c:'#60a5fa'},{t:'',c:''},{t:'veil run literature-review --papers 120',c:'#a78bfa'},{t:'📚 Synthesizing 120 papers...',c:'#34d399'},{t:'✓ Survey draft → /outputs/survey.md',c:'#34d399'},{t:'',c:''},{t:'veil switch --mode flywheel',c:'#a78bfa'},{t:'✓ Context preserved (34k tokens)',c:'#4a4a6a'},{t:'→ Fine-tuning DeepSeek on domain data...',c:'#fbbf24'}]
+let tIdx=0
+function typeNext(el){if(tIdx>=TLINES.length){el.innerHTML+='<span class="tcur"></span>';return}const ln=TLINES[tIdx];if(!ln.t){el.innerHTML+='<br/>';tIdx++;setTimeout(()=>typeNext(el),55);return}const sp=document.createElement('div');sp.style.color=ln.c;el.appendChild(sp);let ci=0;const iv=setInterval(()=>{sp.textContent=ln.t.slice(0,++ci);if(ci>=ln.t.length){clearInterval(iv);tIdx++;setTimeout(()=>typeNext(el),88)}},23)}
+
+/* progress */
+const TOTAL=96;function startProg(){const t0=Date.now(),bar=document.getElementById('prog');(function t(){const e=(Date.now()-t0)/1000;bar.style.width=Math.min(e/TOTAL*100,100)+'%';if(e<TOTAL)requestAnimationFrame(t)})()}
+
+/* auto-start on load */
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    startProg()
+    const c0t=document.getElementById('c0t')
+    const tl=gsap.timeline({defaults:{ease:'power3.out'}})
+    tl.to('#sc0',{opacity:1,duration:.01})
+    tl.add(()=>{typeInto(c0t,"It's 2 AM.").then(()=>{setTimeout(()=>typeInto(c0t,'Twelve browser tabs.'),700);setTimeout(()=>typeInto(c0t,'Still switching tools.'),1950)})})
+    tl.to('#sc0',{opacity:0,duration:.8},'+=4.3')
+    tl.to('#sc1',{opacity:1,duration:.55})
+    tl.to('#lb1',{opacity:1,duration:.4})
+    tl.to('#h1',{opacity:1,y:0,duration:.6},'-=.15')
+    tl.to('#tw0',{opacity:1,duration:.4,ease:'back.out(1.6)'},'+=.2')
+    tl.to('#tw1',{opacity:1,duration:.4,ease:'back.out(1.6)'},'-=.18')
+    tl.to('#tw2',{opacity:1,duration:.4,ease:'back.out(1.6)'},'-=.18')
+    tl.to('#tw3',{opacity:1,duration:.4,ease:'back.out(1.6)'},'-=.18')
+    tl.to('#tw4',{opacity:1,duration:.4,ease:'back.out(1.6)'},'-=.18')
+    tl.to(['#tw0','#tw1','#tw2','#tw3','#tw4'],{y:'random(-9,9)',x:'random(-5,5)',rotation:'random(-3.5,3.5)',duration:1.8,ease:'sine.inOut',stagger:.1,repeat:1,yoyo:true},'+=.5')
+    tl.to('#sc1',{opacity:0,duration:.8},'+=.9')
+    tl.to('#sc2',{opacity:1,duration:.55})
+    tl.to('#lb2',{opacity:1,duration:.38})
+    tl.to('#h2',{opacity:1,y:0,duration:.6},'-=.12')
+    tl.to('#b2',{opacity:1,duration:.5},'-=.1')
+    tl.to('#pi0',{opacity:1,x:0,duration:.5,ease:'power2.out'},'+=.3')
+    tl.to('#pi1',{opacity:1,x:0,duration:.5,ease:'power2.out'},'-=.22')
+    tl.to('#pi2',{opacity:1,x:0,duration:.5,ease:'power2.out'},'-=.22')
+    tl.to('#sc2',{opacity:0,duration:.8},'+=5.5')
+    tl.to('#sc3',{opacity:1,duration:.45})
+    tl.to('#p3',{opacity:1,scale:1,duration:.85,ease:'power4.out'})
+    tl.to('#p3',{opacity:0,scale:1.07,duration:.6,ease:'power2.in'},'+=3.2')
+    tl.to('#sc3',{opacity:0,duration:.3},'-=.3')
+    tl.to('#sc4',{opacity:1,duration:.01})
+    tl.to('#r4l',{opacity:1,scale:1,duration:.9,ease:'back.out(1.8)'},'+=.1')
+    tl.to('#r4n',{opacity:1,y:0,duration:.75,ease:'power3.out'},'-=.3')
+    tl.to('#r4t',{opacity:1,y:0,duration:.65,ease:'power2.out'},'-=.2')
+    tl.to('#r4s',{opacity:1,duration:.5},'-=.1')
+    tl.to('#sc4',{opacity:0,duration:.8},'+=5.5')
+    tl.to('#sc5',{opacity:1,duration:.55})
+    tl.to('#lb5',{opacity:1,duration:.38})
+    tl.to('#h5',{opacity:1,y:0,duration:.6},'-=.12')
+    tl.to('#mc0',{opacity:1,y:0,duration:.6,ease:'back.out(1.4)'},'+=.25')
+    tl.to('#mc1',{opacity:1,y:0,duration:.6,ease:'back.out(1.4)'},'-=.35')
+    tl.to('#mc2',{opacity:1,y:0,duration:.6,ease:'back.out(1.4)'},'-=.35')
+    tl.to('#mc3',{opacity:1,y:0,duration:.6,ease:'back.out(1.4)'},'-=.35')
+    tl.to('#sc5',{opacity:0,duration:.8},'+=7')
+    tl.to('#sc6',{opacity:1,duration:.55})
+    tl.to('#lb6',{opacity:1,duration:.38})
+    tl.to('#h6',{opacity:1,y:0,duration:.6},'-=.12')
+    tl.to('#b6',{opacity:1,duration:.5},'-=.1')
+    tl.to('#trm',{opacity:1,duration:.5},'-=.3')
+    tl.add(()=>typeNext(document.getElementById('tlines')))
+    tl.to('#sc6',{opacity:0,duration:.8},'+=9')
+    tl.to('#sc7',{opacity:1,duration:.55})
+    tl.to('#lb7',{opacity:1,duration:.38})
+    tl.to('#h7',{opacity:1,y:0,duration:.6},'-=.12')
+    tl.to('#rt0',{opacity:1,y:0,duration:.6,ease:'back.out(1.3)'},'+=.3')
+    tl.to('#rt1',{opacity:1,y:0,duration:.6,ease:'back.out(1.3)'},'-=.3')
+    tl.to('#rt2',{opacity:1,y:0,duration:.6,ease:'back.out(1.3)'},'-=.3')
+    tl.to('#sc7',{opacity:0,duration:.8},'+=7.5')
+    tl.to('#sc8',{opacity:1,duration:.55})
+    tl.to('#lb8',{opacity:1,duration:.38})
+    tl.to('#fc',{opacity:1,y:0,duration:.75,ease:'power3.out'},'-=.18')
+    tl.to('#sc8',{opacity:0,duration:.8},'+=9.5')
+    tl.to('#sc9',{opacity:1,duration:.75})
+    tl.to('#ctabadge',{opacity:1,duration:.45},'+=.3')
+    tl.to('#cta1',{opacity:1,y:0,duration:.7},'-=.1')
+    tl.to('#cta2',{opacity:1,y:0,duration:.7},'-=.42')
+    tl.to('#ctab',{opacity:1,duration:.5},'-=.2')
+    tl.to('#ctabtn',{opacity:1,duration:.55},'-=.1')
+    tl.to('#ctabtn',{boxShadow:'0 0 80px rgba(139,92,246,.8)',duration:1.3,ease:'sine.inOut',repeat:-1,yoyo:true},'+=.5')
+  }, 1200)
+})
+</script>
+</body>
+</html>

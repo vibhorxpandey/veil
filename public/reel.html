@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Veil Research — Reel</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script>window.onerror = () => true;</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--w:390px;--h:844px;}
+body{
+  width:var(--w);height:var(--h);overflow:hidden;
+  background:#020209;
+  font-family:-apple-system,"Inter","Segoe UI",sans-serif;
+  color:#ededff;position:relative;cursor:pointer;
+  user-select:none;
+}
+
+/* ── progress bar ── */
+#prog{
+  position:fixed;top:0;left:0;height:3px;width:0%;z-index:999;
+  background:linear-gradient(90deg,#8b5cf6,#3b82f6);
+}
+
+/* ── noise grain overlay ── */
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:998;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  opacity:.4;mix-blend-mode:overlay;
+}
+
+/* ── scenes ── */
+.sc{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  padding:48px 32px;
+}
+
+/* ── glows ── */
+.glow-orb{
+  position:absolute;border-radius:50%;
+  filter:blur(80px);pointer-events:none;
+}
+
+/* ── typography ── */
+.eyebrow{
+  font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  color:#8b5cf6;margin-bottom:20px;
+  display:flex;align-items:center;gap:8px;
+}
+.eyebrow::before{
+  content:'';width:5px;height:5px;border-radius:50%;background:#8b5cf6;
+  animation:blink 1.4s ease-in-out infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+.display{font-size:52px;font-weight:900;letter-spacing:-.04em;line-height:1.05;text-align:center;}
+.heading{font-size:38px;font-weight:800;letter-spacing:-.035em;line-height:1.1;text-align:center;}
+.sub{font-size:17px;color:#9898c8;line-height:1.65;text-align:center;font-weight:500;}
+
+.grad{background:linear-gradient(135deg,#c4b5fd 0%,#93c5fd 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.grad-r{background:linear-gradient(135deg,#fda4af 0%,#fb923c 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.grad-g{background:linear-gradient(135deg,#6ee7b7 0%,#3b82f6 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+
+/* ── flash overlay for cuts ── */
+#flash{
+  position:fixed;inset:0;background:#fff;opacity:0;
+  pointer-events:none;z-index:997;
+}
+/* ── dark flash ── */
+#dflash{
+  position:fixed;inset:0;background:#000;opacity:0;
+  pointer-events:none;z-index:997;
+}
+
+/* ── S1: hook ── */
+#s1 .stat{
+  font-size:72px;font-weight:900;letter-spacing:-.06em;line-height:1;
+  text-align:center;margin-bottom:8px;
+}
+#s1 .stat-label{
+  font-size:15px;color:#7878a8;text-align:center;line-height:1.6;max-width:280px;
+}
+#s1 .question{
+  font-size:28px;font-weight:800;letter-spacing:-.025em;
+  text-align:center;margin-top:36px;line-height:1.2;
+}
+
+/* ── S2a: tabs chaos ── */
+.tab-strip{
+  display:flex;flex-direction:column;gap:9px;width:100%;
+}
+.tab-item{
+  display:flex;align-items:center;gap:10px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:10px;padding:11px 14px;
+}
+.tab-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.tab-title{font-size:12px;color:#7878a8;font-weight:500;}
+.tab-url{font-size:10px;color:rgba(120,120,168,.4);margin-left:auto;}
+.chaos-label{
+  font-size:22px;font-weight:800;letter-spacing:-.02em;
+  text-align:center;line-height:1.3;
+}
+
+/* ── S2b: loading ── */
+.loading-box{
+  background:rgba(8,8,20,.9);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:16px;padding:28px 24px;width:100%;
+}
+.loading-title{font-size:12px;font-weight:700;color:#8b5cf6;letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px;}
+.loading-bar-bg{background:rgba(255,255,255,.06);border-radius:100px;height:6px;margin-bottom:10px;overflow:hidden;}
+.loading-bar-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,#8b5cf6,#3b82f6);width:0%;}
+.loading-line{font-size:10.5px;color:rgba(120,120,168,.5);margin-bottom:6px;font-family:monospace;}
+
+/* ── S3: solution ── */
+.ui-card{
+  background:rgba(8,8,22,.95);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:20px;padding:0;overflow:hidden;
+  width:100%;
+  box-shadow:0 32px 80px rgba(0,0,0,.7),0 0 0 1px rgba(139,92,246,.15);
+}
+.ui-titlebar{
+  display:flex;align-items:center;gap:7px;
+  padding:12px 16px;
+  border-bottom:1px solid rgba(255,255,255,.07);
+  background:rgba(255,255,255,.02);
+}
+.ui-dot{width:9px;height:9px;border-radius:50%;}
+.ui-name{font-size:11px;color:#4a4a6a;font-weight:600;margin-left:4px;letter-spacing:.06em;}
+.mode-tabs{
+  display:flex;gap:6px;padding:14px 16px 10px;
+  overflow:hidden;
+}
+.mode-tab{
+  flex:1;padding:9px 6px;border-radius:10px;
+  font-size:10px;font-weight:700;text-align:center;letter-spacing:.04em;
+  border:1px solid rgba(255,255,255,.07);
+  color:#4a4a6a;background:transparent;
+  transition:all .3s;
+}
+.mode-tab.active{
+  color:#ededff;background:rgba(139,92,246,.18);
+  border-color:rgba(139,92,246,.4);
+}
+.ui-content{padding:16px;min-height:100px;}
+.ui-row{display:flex;align-items:center;gap:9px;margin-bottom:9px;}
+.ui-avatar{width:28px;height:28px;border-radius:8px;flex-shrink:0;}
+.ui-line{height:9px;border-radius:100px;background:rgba(255,255,255,.07);}
+.ui-line-short{height:9px;border-radius:100px;background:rgba(255,255,255,.05);width:60%;}
+
+/* ── S4: social proof ── */
+.proof-number{
+  font-size:68px;font-weight:900;letter-spacing:-.055em;line-height:1;text-align:center;
+}
+.proof-label{font-size:14px;color:#7878a8;text-align:center;letter-spacing:.06em;text-transform:uppercase;margin-top:4px;}
+.proof-divider{width:1px;height:60px;background:rgba(255,255,255,.1);margin:0 20px;}
+
+/* globe dots */
+#globe-wrap{position:relative;width:280px;height:280px;margin:0 auto;}
+.gdot{
+  position:absolute;border-radius:50%;
+  background:#8b5cf6;
+  box-shadow:0 0 8px rgba(139,92,246,.8);
+}
+
+/* ── S5: CTA ── */
+#s5 .cta-url{
+  font-size:42px;font-weight:900;letter-spacing:-.04em;text-align:center;
+}
+#s5 .cta-sub{
+  font-size:18px;font-weight:700;color:#8b5cf6;text-align:center;margin-top:12px;
+}
+#s5 .logo-wrap{
+  display:flex;align-items:center;gap:12px;margin-top:36px;
+}
+#s5 .logo-img{width:44px;height:44px;object-fit:contain;filter:invert(1);}
+#s5 .logo-name{font-size:22px;font-weight:800;color:#ededff;}
+
+/* ── play overlay ── */
+#overlay{
+  position:fixed;inset:0;z-index:996;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(2,2,9,.97);gap:20px;
+}
+#overlay h2{font-size:22px;font-weight:800;color:#ededff;}
+#overlay p{font-size:13px;color:#7878a8;text-align:center;max-width:240px;line-height:1.6;}
+#playbtn{
+  width:72px;height:72px;border-radius:50%;
+  border:1.5px solid rgba(139,92,246,.45);
+  background:rgba(139,92,246,.12);
+  color:#c4b5fd;font-size:26px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .25s;
+}
+#playbtn:hover{background:rgba(139,92,246,.28);transform:scale(1.08);}
+
+/* replay */
+#replay{
+  position:fixed;bottom:28px;right:24px;z-index:999;
+  background:rgba(139,92,246,.18);border:1px solid rgba(139,92,246,.35);
+  border-radius:100px;padding:8px 18px;font-size:12px;font-weight:700;
+  color:#c4b5fd;cursor:pointer;display:none;
+  letter-spacing:.06em;
+}
+</style>
+</head>
+<body>
+
+<div id="prog"></div>
+<div id="flash"></div>
+<div id="dflash"></div>
+
+<!-- ─── OVERLAY ─── -->
+<div id="overlay">
+  <div class="eyebrow">Veil Research · 15s Reel</div>
+  <h2>Watch the Ad</h2>
+  <p>Instagram Reels · TikTok · YouTube Shorts</p>
+  <div id="playbtn">▶</div>
+</div>
+
+<button id="replay">↺ Replay</button>
+
+<!-- ─── SCENE 1: HOOK ─── -->
+<div class="sc" id="s1">
+  <!-- glow -->
+  <div class="glow-orb" style="width:320px;height:320px;top:-80px;left:50%;transform:translateX(-50%);background:rgba(139,92,246,.18);"></div>
+
+  <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
+    <div class="eyebrow" id="s1-eye">RESEARCH REALITY</div>
+    <div class="stat" id="s1-stat"><span class="grad-r">40%</span></div>
+    <div class="stat-label" id="s1-statl">of research time is wasted<br>switching between tools.</div>
+    <div class="question" id="s1-q">What if you never<br>had to <span class="grad">again?</span></div>
+  </div>
+</div>
+
+<!-- ─── SCENE 2A: TAB CHAOS ─── -->
+<div class="sc" id="s2a">
+  <div class="glow-orb" style="width:200px;height:200px;top:100px;right:-60px;background:rgba(239,68,68,.12);"></div>
+
+  <div class="chaos-label" id="s2a-label" style="margin-bottom:24px;">
+    Papers <span class="grad-r">here.</span> Code <span class="grad-r">there.</span><br>Writing <span class="grad-r">somewhere else.</span>
+  </div>
+  <div class="tab-strip" id="s2a-tabs">
+    <div class="tab-item">
+      <div class="tab-dot" style="background:#ef4444;"></div>
+      <div class="tab-title">arXiv: Attention Is All You Need</div>
+      <div class="tab-url">arxiv.org</div>
+    </div>
+    <div class="tab-item">
+      <div class="tab-dot" style="background:#f59e0b;"></div>
+      <div class="tab-title">Google Colab — Untitled.ipynb</div>
+      <div class="tab-url">colab.research.google</div>
+    </div>
+    <div class="tab-item">
+      <div class="tab-dot" style="background:#3b82f6;"></div>
+      <div class="tab-title">ChatGPT — New conversation</div>
+      <div class="tab-url">chat.openai.com</div>
+    </div>
+    <div class="tab-item">
+      <div class="tab-dot" style="background:#10b981;"></div>
+      <div class="tab-title">Overleaf — Research Draft v7</div>
+      <div class="tab-url">overleaf.com</div>
+    </div>
+    <div class="tab-item">
+      <div class="tab-dot" style="background:#8b5cf6;"></div>
+      <div class="tab-title">Notion — Literature Review</div>
+      <div class="tab-url">notion.so</div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── SCENE 2B: GPU LOADING ─── -->
+<div class="sc" id="s2b">
+  <div class="glow-orb" style="width:240px;height:240px;bottom:-40px;left:-60px;background:rgba(251,146,60,.1);"></div>
+
+  <div class="chaos-label" id="s2b-label" style="margin-bottom:28px;">
+    Hours wasted<br>on <span class="grad-r">setup.</span>
+  </div>
+  <div class="loading-box">
+    <div class="loading-title">⚙ Environment Setup</div>
+    <div class="loading-line">Installing CUDA 12.1…</div>
+    <div class="loading-bar-bg"><div class="loading-bar-fill" id="lb1"></div></div>
+    <div class="loading-line">Downloading model weights (14.2 GB)…</div>
+    <div class="loading-bar-bg"><div class="loading-bar-fill" id="lb2"></div></div>
+    <div class="loading-line" style="color:#ef4444;">✗ CUDA version mismatch — retry?</div>
+    <div style="margin-top:14px;font-size:11px;color:rgba(120,120,168,.35);font-family:monospace;">Session timeout in 12 min</div>
+  </div>
+</div>
+
+<!-- ─── SCENE 3: SOLUTION ─── -->
+<div class="sc" id="s3">
+  <div class="glow-orb" style="width:360px;height:360px;top:-100px;left:50%;transform:translateX(-50%);background:rgba(59,130,246,.15);"></div>
+
+  <div class="eyebrow" id="s3-eye" style="margin-bottom:12px;">THE SOLUTION</div>
+  <div class="heading" id="s3-title" style="margin-bottom:24px;">
+    Meet <span class="grad">Veil Research.</span>
+  </div>
+  <div class="sub" id="s3-sub" style="margin-bottom:20px;font-size:15px;">One AI workspace. Everything in sync.</div>
+
+  <div class="ui-card" id="s3-card">
+    <div class="ui-titlebar">
+      <div class="ui-dot" style="background:#ef4444;"></div>
+      <div class="ui-dot" style="background:#f59e0b;"></div>
+      <div class="ui-dot" style="background:#10b981;"></div>
+      <div class="ui-name">VEIL RESEARCH</div>
+      <div style="margin-left:auto;font-size:10px;color:#8b5cf6;font-weight:700;">● LIVE</div>
+    </div>
+    <div class="mode-tabs">
+      <div class="mode-tab active" id="mt0">Research</div>
+      <div class="mode-tab" id="mt1">Biology</div>
+      <div class="mode-tab" id="mt2">Flywheel</div>
+      <div class="mode-tab" id="mt3">Write</div>
+    </div>
+    <div class="ui-content">
+      <div class="ui-row">
+        <div class="ui-avatar" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6);"></div>
+        <div style="flex:1;">
+          <div class="ui-line" style="width:80%;margin-bottom:6px;"></div>
+          <div class="ui-line-short"></div>
+        </div>
+      </div>
+      <div class="ui-row">
+        <div class="ui-avatar" style="background:linear-gradient(135deg,#10b981,#3b82f6);"></div>
+        <div style="flex:1;">
+          <div class="ui-line" style="width:90%;margin-bottom:6px;"></div>
+          <div class="ui-line-short" style="width:45%;"></div>
+        </div>
+      </div>
+      <div style="height:9px;border-radius:100px;background:rgba(255,255,255,.05);margin-top:4px;width:70%;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── SCENE 4: SOCIAL PROOF ─── -->
+<div class="sc" id="s4">
+  <div class="glow-orb" style="width:300px;height:300px;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(139,92,246,.12);"></div>
+
+  <div class="eyebrow" id="s4-eye">ALREADY TRUSTED BY</div>
+
+  <div style="display:flex;align-items:center;justify-content:center;margin:24px 0 32px;" id="s4-nums">
+    <div style="text-align:center;">
+      <div class="proof-number"><span class="grad">2,400</span><span style="font-size:36px;font-weight:900;color:#8b5cf6;">+</span></div>
+      <div class="proof-label">Researchers</div>
+    </div>
+    <div class="proof-divider"></div>
+    <div style="text-align:center;">
+      <div class="proof-number"><span class="grad-g">1,000</span><span style="font-size:36px;font-weight:900;color:#10b981;">+</span></div>
+      <div class="proof-label">Workflows</div>
+    </div>
+  </div>
+
+  <!-- globe dots -->
+  <div id="globe-wrap">
+    <svg width="280" height="180" viewBox="0 0 280 180" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);">
+      <!-- globe ellipses -->
+      <ellipse cx="140" cy="90" rx="130" ry="80" fill="none" stroke="rgba(139,92,246,.12)" stroke-width="1"/>
+      <ellipse cx="140" cy="90" rx="85" ry="80" fill="none" stroke="rgba(139,92,246,.08)" stroke-width="1"/>
+      <ellipse cx="140" cy="90" rx="130" ry="30" fill="none" stroke="rgba(139,92,246,.1)" stroke-width="1"/>
+      <line x1="10" y1="90" x2="270" y2="90" stroke="rgba(139,92,246,.08)" stroke-width="1"/>
+      <line x1="140" y1="10" x2="140" y2="170" stroke="rgba(139,92,246,.08)" stroke-width="1"/>
+    </svg>
+    <!-- glow dots placed around globe -->
+    <div class="gdot" style="width:8px;height:8px;top:30px;left:80px;" id="gd1"></div>
+    <div class="gdot" style="width:6px;height:6px;top:50px;left:190px;background:#3b82f6;box-shadow:0 0 8px rgba(59,130,246,.9);" id="gd2"></div>
+    <div class="gdot" style="width:10px;height:10px;top:90px;left:130px;" id="gd3"></div>
+    <div class="gdot" style="width:6px;height:6px;top:110px;left:60px;background:#10b981;box-shadow:0 0 8px rgba(16,185,129,.9);" id="gd4"></div>
+    <div class="gdot" style="width:7px;height:7px;top:70px;left:230px;" id="gd5"></div>
+    <div class="gdot" style="width:5px;height:5px;top:130px;left:175px;background:#f59e0b;box-shadow:0 0 8px rgba(245,158,11,.9);" id="gd6"></div>
+    <div class="gdot" style="width:9px;height:9px;top:40px;left:145px;" id="gd7"></div>
+    <div class="gdot" style="width:5px;height:5px;top:100px;left:210px;background:#3b82f6;box-shadow:0 0 8px rgba(59,130,246,.9);" id="gd8"></div>
+  </div>
+</div>
+
+<!-- ─── SCENE 5: CTA ─── -->
+<div class="sc" id="s5">
+  <div class="glow-orb" style="width:400px;height:400px;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(139,92,246,.2);"></div>
+
+  <div id="s5-logo" class="logo-wrap" style="margin-top:0;margin-bottom:36px;">
+    <img src="/logo-transparent.png" class="logo-img" alt="Veil" onerror="this.style.display='none'"/>
+    <div class="logo-name">Veil Research</div>
+  </div>
+
+  <div class="cta-url" id="s5-url">
+    <span class="grad">veilresearch</span><span style="color:#ededff;">.com</span>
+  </div>
+  <div class="cta-sub" id="s5-sub">Get Early Access →</div>
+
+  <div style="margin-top:32px;display:flex;gap:10px;" id="s5-tags">
+    <div style="padding:7px 16px;border-radius:100px;border:1px solid rgba(139,92,246,.3);background:rgba(139,92,246,.1);font-size:12px;font-weight:700;color:#c4b5fd;">Research AI</div>
+    <div style="padding:7px 16px;border-radius:100px;border:1px solid rgba(59,130,246,.3);background:rgba(59,130,246,.1);font-size:12px;font-weight:700;color:#93c5fd;">4 AI Models</div>
+    <div style="padding:7px 16px;border-radius:100px;border:1px solid rgba(16,185,129,.3);background:rgba(16,185,129,.1);font-size:12px;font-weight:700;color:#6ee7b7;">Free Trial</div>
+  </div>
+</div>
+
+<script>
+const TOTAL = 15000; // 15 seconds
+const $ = id => document.getElementById(id);
+
+function flash(dark=false, dur=80){
+  const el = dark ? $('dflash') : $('flash');
+  gsap.to(el,{opacity: dark ? .6 : .35, duration:dur/1000,
+    onComplete:()=>gsap.to(el,{opacity:0,duration:dur/1000*1.5})});
+}
+
+function showScene(id, dur=0.35){
+  return gsap.to($(id),{opacity:1,duration:dur,ease:'power2.inOut'});
+}
+function hideScene(id, dur=0.25){
+  return gsap.to($(id),{opacity:0,duration:dur,ease:'power2.inOut'});
+}
+
+function animateGlobeDots(){
+  const dots = ['gd1','gd2','gd3','gd4','gd5','gd6','gd7','gd8'];
+  dots.forEach((id,i)=>{
+    gsap.from($(id),{scale:0,opacity:0,duration:.4,delay:i*.12,ease:'back.out(2)'});
+    gsap.to($(id),{opacity:.3,duration:.8+Math.random()*.6,yoyo:true,repeat:8,
+      delay:Math.random()*1.2,ease:'sine.inOut'});
+  });
+}
+
+function animateModes(){
+  const tabs = [0,1,2,3];
+  let i=0;
+  const cycle=()=>{
+    tabs.forEach(j=>{ $('mt'+j).classList.remove('active'); });
+    $('mt'+tabs[i%4]).classList.add('active');
+    i++;
+  };
+  cycle();
+  setTimeout(cycle,700);
+  setTimeout(cycle,1400);
+  setTimeout(cycle,2100);
+}
+
+function startReel(){
+  $('overlay').style.display='none';
+  $('replay').style.display='none';
+
+  const tl = gsap.timeline();
+  const _h = {v:0}; // dummy hold target
+
+  // progress bar
+  gsap.to($('prog'),{width:'100%',duration:TOTAL/1000,ease:'none'});
+
+  // ── S1 [0–3s]: hook
+  tl.call(()=>{ showScene('s1'); })
+    .call(()=>{
+      gsap.from($('s1-eye'),{y:-16,opacity:0,duration:.5});
+      gsap.from($('s1-stat'),{scale:1.4,opacity:0,duration:.55,delay:.15,ease:'back.out(1.4)'});
+      gsap.from($('s1-statl'),{y:12,opacity:0,duration:.45,delay:.35});
+      gsap.from($('s1-q'),{y:20,opacity:0,duration:.5,delay:.65});
+    })
+    .to(_h,{v:0,duration:3})
+
+  // ── cut to S2a [3–4.5s]: tab chaos
+    .call(()=>{ flash(); hideScene('s1'); })
+    .call(()=>{ showScene('s2a'); }, '<0.12')
+    .call(()=>{
+      gsap.from($('s2a-label'),{x:-20,opacity:0,duration:.35});
+      const tabs = Array.from($('s2a-tabs').querySelectorAll('.tab-item'));
+      tabs.forEach((el,i)=>gsap.from(el,{x:30,opacity:0,duration:.3,delay:.2+i*.07}));
+    }, '<0.1')
+    .to(_h,{v:0,duration:1.5})
+
+  // ── cut to S2b [4.5–6.5s]: loading
+    .call(()=>{ flash(true); hideScene('s2a'); })
+    .call(()=>{ showScene('s2b'); }, '<0.12')
+    .call(()=>{
+      gsap.from($('s2b-label'),{y:-16,opacity:0,duration:.35});
+      gsap.to($('lb1'),{width:'68%',duration:1.8,ease:'power1.inOut',delay:.3});
+      gsap.to($('lb2'),{width:'31%',duration:1.8,ease:'power1.inOut',delay:.5});
+    }, '<0.1')
+    .to(_h,{v:0,duration:2})
+
+  // ── cut to S3 [6.5–10s]: solution
+    .call(()=>{ flash(); hideScene('s2b'); })
+    .call(()=>{ showScene('s3',0.5); }, '<0.12')
+    .call(()=>{
+      gsap.from($('s3-eye'),{y:-12,opacity:0,duration:.4});
+      gsap.from($('s3-title'),{y:16,opacity:0,duration:.45,delay:.15});
+      gsap.from($('s3-sub'),{y:10,opacity:0,duration:.4,delay:.3});
+      gsap.from($('s3-card'),{y:30,opacity:0,duration:.5,delay:.45,ease:'back.out(1.2)'});
+      setTimeout(animateModes, 600);
+    }, '<0.1')
+    .to(_h,{v:0,duration:3.5})
+
+  // ── cut to S4 [10–13s]: social proof
+    .call(()=>{ flash(); hideScene('s3'); })
+    .call(()=>{ showScene('s4',0.4); }, '<0.12')
+    .call(()=>{
+      gsap.from($('s4-eye'),{y:-14,opacity:0,duration:.4});
+      gsap.from($('s4-nums'),{scale:.88,opacity:0,duration:.5,delay:.2,ease:'back.out(1.5)'});
+      setTimeout(animateGlobeDots, 400);
+    }, '<0.1')
+    .to(_h,{v:0,duration:3})
+
+  // ── cut to S5 [13–15s]: CTA
+    .call(()=>{ flash(); hideScene('s4'); })
+    .call(()=>{ showScene('s5',0.45); }, '<0.12')
+    .call(()=>{
+      gsap.from($('s5-logo'),{y:-16,opacity:0,duration:.45});
+      gsap.from($('s5-url'),{scale:1.15,opacity:0,duration:.5,delay:.2,ease:'back.out(1.4)'});
+      gsap.from($('s5-sub'),{y:10,opacity:0,duration:.4,delay:.4});
+      gsap.from($('s5-tags'),{y:16,opacity:0,duration:.4,delay:.6});
+    }, '<0.1')
+    .to(_h,{v:0,duration:2})
+
+  // end
+    .call(()=>{
+      $('replay').style.display='block';
+    });
+}
+
+$('playbtn').onclick = startReel;
+$('replay').onclick = ()=>{ location.reload(); };
+</script>
+</body>
+</html>

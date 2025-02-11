@@ -82,7 +82,7 @@ const MODES = [
     color: "#3b82f6",
     glow: "rgba(59,130,246,0.25)",
     border: "rgba(59,130,246,0.35)",
-    desc: "End-to-end research execution: hypothesis framing, literature synthesis, experiment planning, GPU training, evaluations, and manuscript drafting.",
+    desc: "Full-cycle research automation: from framing hypotheses and synthesizing literature to planning experiments, GPU training, running evaluations, and drafting manuscripts.",
     tags: ["Literature Synthesis", "Hypothesis Framing", "Manuscript Drafting"],
   },
   {
@@ -92,7 +92,7 @@ const MODES = [
     color: "#10b981",
     glow: "rgba(16,185,129,0.25)",
     border: "rgba(16,185,129,0.35)",
-    desc: "Wet-lab and computational biology specialist for protein design, genomics, pathway analysis, and biomedical reasoning workflows.",
+    desc: "Your specialist for both wet-lab and computational biology — covering protein design, genomics, pathway analysis, and biomedical reasoning workflows.",
     tags: ["Protein Design", "Genomics", "Pathway Analysis"],
   },
   {
@@ -102,7 +102,7 @@ const MODES = [
     color: "#f59e0b",
     glow: "rgba(245,158,11,0.25)",
     border: "rgba(245,158,11,0.35)",
-    desc: "Build compounding model improvements from production usage, auto-design fine-tunes, run evaluations, and ship stronger versions continuously.",
+    desc: "Turn production usage into compounding model gains — automatically design fine-tunes, run evaluations, and continuously ship better versions.",
     tags: ["Auto Fine-tuning", "Evaluations", "Model Shipping"],
   },
   {
@@ -112,57 +112,57 @@ const MODES = [
     color: "#8b5cf6",
     glow: "rgba(139,92,246,0.25)",
     border: "rgba(139,92,246,0.35)",
-    desc: "Turn rough notes into publication-ready output with structured arguments, verified citations, clean LaTeX, and camera-ready formatting.",
+    desc: "Transform rough notes into publication-ready papers with structured arguments, fact-checked citations, clean LaTeX, and camera-ready layouts.",
     tags: ["LaTeX Output", "Citation Verification", "Camera-Ready"],
   },
 ]
 
 const WORKFLOWS = [
-  { cat: "Research", name: "Literature Review Pipeline", desc: "Synthesize 100+ papers into a structured survey", color: "#3b82f6" },
-  { cat: "Biology", name: "Protein Structure Prediction", desc: "Run AlphaFold variants on custom sequences", color: "#10b981" },
-  { cat: "Flywheel", name: "SFT Fine-Tune on Custom Data", desc: "Supervised fine-tune DeepSeek on domain datasets", color: "#f59e0b" },
-  { cat: "Write", name: "Manuscript Drafting", desc: "From outline to LaTeX-formatted first draft", color: "#8b5cf6" },
-  { cat: "Research", name: "Hypothesis Generation", desc: "AI-assisted research question formulation", color: "#3b82f6" },
-  { cat: "Biology", name: "Genomics Pipeline", desc: "Variant calling, annotation, and pathway mapping", color: "#10b981" },
-  { cat: "Flywheel", name: "Evaluation Harness Setup", desc: "Automated benchmark suite for model versions", color: "#f59e0b" },
-  { cat: "Write", name: "Argument Structuring", desc: "Turn notes into coherent paper structure", color: "#8b5cf6" },
-  { cat: "Research", name: "Experiment Planning", desc: "Design ablations and statistical test plans", color: "#3b82f6" },
-  { cat: "Biology", name: "Drug-Target Interaction", desc: "Screen compound libraries against protein targets", color: "#10b981" },
-  { cat: "Flywheel", name: "RLHF Data Collection", desc: "Auto-generate preference pairs from prod logs", color: "#f59e0b" },
-  { cat: "Write", name: "Citation Verification", desc: "Real-time fact-checking against OpenAlex/PubMed", color: "#8b5cf6" },
+  { cat: "Research", name: "Literature Synthesis Pipeline", desc: "Condense 100+ papers into one organized survey", color: "#3b82f6" },
+  { cat: "Biology", name: "Protein Structure Analysis", desc: "Execute AlphaFold variants on your own sequences", color: "#10b981" },
+  { cat: "Flywheel", name: "Custom Data SFT Fine-Tuning", desc: "Supervised fine-tune DeepSeek on specialized datasets", color: "#f59e0b" },
+  { cat: "Write", name: "Paper Drafting", desc: "Go from outline to a LaTeX-ready first draft", color: "#8b5cf6" },
+  { cat: "Research", name: "Research Hypothesis Builder", desc: "AI-guided formulation of research questions", color: "#3b82f6" },
+  { cat: "Biology", name: "Genomics Analysis Pipeline", desc: "Perform variant calling, annotation, and pathway mapping", color: "#10b981" },
+  { cat: "Flywheel", name: "Benchmark Harness Configuration", desc: "Automated benchmarks across model checkpoints", color: "#f59e0b" },
+  { cat: "Write", name: "Paper Structure Builder", desc: "Convert notes into a well-organized paper structure", color: "#8b5cf6" },
+  { cat: "Research", name: "Experiment Design Tool", desc: "Plan ablations and statistical testing strategies", color: "#3b82f6" },
+  { cat: "Biology", name: "Compound-Target Screening", desc: "Screen compound libraries against specific protein targets", color: "#10b981" },
+  { cat: "Flywheel", name: "Preference Data Generator", desc: "Automatically generate preference pairs from production logs", color: "#f59e0b" },
+  { cat: "Write", name: "Citation Fact-Checker", desc: "Live fact-checking against OpenAlex and PubMed", color: "#8b5cf6" },
 ]
 
 const INTEGRATIONS = [
-  { name: "GitHub", icon: GitBranch, desc: "Code repos & version control" },
-  { name: "Hugging Face", icon: Sparkles, desc: "Models, datasets & spaces" },
-  { name: "Weights & Biases", icon: Activity, desc: "Experiment tracking" },
-  { name: "Modal", icon: Cloud, desc: "Serverless GPU compute" },
-  { name: "Prime Intellect", icon: Cpu, desc: "Distributed training" },
-  { name: "Pinecone", icon: Database, desc: "Vector database" },
-  { name: "OpenAlex", icon: Globe, desc: "Academic literature graph" },
-  { name: "PubMed", icon: Microscope, desc: "Biomedical literature" },
+  { name: "GitHub", icon: GitBranch, desc: "Repositories and version control" },
+  { name: "Hugging Face", icon: Sparkles, desc: "Models, datasets, and Spaces" },
+  { name: "Weights & Biases", icon: Activity, desc: "Track experiments" },
+  { name: "Modal", icon: Cloud, desc: "On-demand GPU compute" },
+  { name: "Prime Intellect", icon: Cpu, desc: "Distributed model training" },
+  { name: "Pinecone", icon: Database, desc: "Vector search database" },
+  { name: "OpenAlex", icon: Globe, desc: "Open academic knowledge graph" },
+  { name: "PubMed", icon: Microscope, desc: "Biomedical research database" },
 ]
 
 const RUNTIME_FEATURES = [
   {
     icon: Box,
-    title: "Persistent Sandboxes",
-    desc: "Each agent continues inside an isolated, stateful environment with full checkpointing and deterministic resume.",
-    points: ["State recovery without manual setup", "Every run remains reproducible", "Context survives disconnects automatically"],
+    title: "Stateful Sandboxes",
+    desc: "Every agent runs inside an isolated, stateful environment with full checkpointing and reliable resume.",
+    points: ["Resume from any state without manual intervention", "Runs stay fully reproducible", "Context is preserved through disconnections"],
     color: "#8b5cf6",
   },
   {
     icon: Zap,
-    title: "Elastic Compute Profiles",
-    desc: "Scale from lightweight analysis nodes to full GPU clusters without changing prompts, workflows, or context state.",
-    points: ["From CPU sessions to multi-GPU clusters", "Model runs, evaluations, and writing in one flow", "Dynamic allocation based on task intensity"],
+    title: "Flexible Compute Scaling",
+    desc: "Go from a single analysis node to a full GPU cluster — no need to change prompts, workflows, or context.",
+    points: ["Covers single-CPU sessions all the way to multi-GPU clusters", "Training, evaluations, and writing in one unified flow", "Resources allocated dynamically by task demand"],
     color: "#3b82f6",
   },
   {
     icon: Server,
-    title: "Asynchronous Work Orchestration",
-    desc: "Queue long evaluations, training loops, and literature synthesis pipelines while your browser session is offline.",
-    points: ["Background queues continue while you are away", "Automatic artifact collection and organization", "Morning-ready summaries delivered to dashboard"],
+    title: "Background Job Orchestration",
+    desc: "Send long evaluations, training runs, and literature pipelines to a background queue while you're away.",
+    points: ["Jobs keep running even when you close the browser", "Artifacts are collected and organized automatically", "Results delivered to your dashboard, ready when you return"],
     color: "#10b981",
   },
 ]
@@ -232,7 +232,7 @@ export default function Home() {
           <div style={{ marginBottom: "24px" }}>
             <Badge color="#8b5cf6">
               <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#8b5cf6", display: "inline-block" }} className="animate-pulse-glow" />
-              Now in Early Access — Join 2,400+ researchers
+              Now in Early Access — 2,400+ researchers already inside
             </Badge>
           </div>
 
@@ -245,7 +245,7 @@ export default function Home() {
           }}>
             <span className="gradient-text">Train models and</span>
             <br />
-            <span style={{ color: "#ededff" }}>read papers in one flow.</span>
+            <span style={{ color: "#ededff" }}>read papers in one place.</span>
           </h1>
 
           <p style={{
@@ -255,8 +255,8 @@ export default function Home() {
             maxWidth: "600px",
             margin: "0 auto 48px",
           }}>
-            Four specialized AI modes. 1000s of workflows. Fine-tune DeepSeek on Tinker GPUs,
-            run evaluations, and review literature in one continuous workspace orchestrated by your agents.
+            Four purpose-built AI modes. Thousands of workflows. Fine-tune DeepSeek on Tinker GPUs,
+            run evaluations, and read the latest research — all in one continuous workspace driven by your agents.
           </p>
 
           {/* Email capture */}
@@ -267,7 +267,7 @@ export default function Home() {
               background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.3)",
               color: "#6ee7b7", fontSize: "15px", fontWeight: 600,
             }}>
-              <Check size={18} /> You&apos;re on the list — we&apos;ll be in touch.
+              <Check size={18} /> You&apos;re in — we&apos;ll reach out soon.
             </div>
           ) : (
             <form onSubmit={handleWaitlist} className="hero-form" style={{
@@ -290,7 +290,7 @@ export default function Home() {
                 background: "linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%)",
                 boxShadow: "0 0 30px rgba(139,92,246,0.4)",
               }}>
-                Join Waitlist
+                Reserve My Spot
               </button>
             </form>
           )}
@@ -300,14 +300,14 @@ export default function Home() {
               display: "inline-flex", alignItems: "center", gap: "6px",
               fontSize: "14px", color: "#7878a8", textDecoration: "none",
             }}>
-              Open Dashboard <ArrowRight size={14} />
+              Go to Dashboard <ArrowRight size={14} />
             </a>
             <span style={{ color: "#2d2d4e" }}>|</span>
             <a href="#modes" style={{
               display: "inline-flex", alignItems: "center", gap: "6px",
               fontSize: "14px", color: "#7878a8", textDecoration: "none",
             }}>
-              Explore Modes <ChevronRight size={14} />
+              See All Modes <ChevronRight size={14} />
             </a>
           </div>
         </div>
@@ -341,20 +341,20 @@ export default function Home() {
         padding: "120px 24px",
         maxWidth: "1200px", margin: "0 auto",
       }}>
-        <SectionLabel>4 Modes</SectionLabel>
+        <SectionLabel>Four Modes</SectionLabel>
 
         <h2 style={{
           fontSize: "clamp(32px, 4vw, 52px)", fontWeight: 800,
           textAlign: "center", letterSpacing: "-0.03em",
           marginBottom: "16px", color: "#ededff",
         }}>
-          Switch modes. <span className="gradient-text">Never drop context.</span>
+          Switch instantly. <span className="gradient-text">Keep everything.</span>
         </h2>
         <p style={{
           textAlign: "center", color: "#7878a8", fontSize: "17px",
           maxWidth: "520px", margin: "0 auto 64px", lineHeight: 1.65,
         }}>
-          Switch modes mid-session to change objectives, tool access, and execution style without losing any context or history.
+          Change your mode mid-session to shift focus, tools, and execution style — without losing a single token of context.
         </p>
 
         {/* Mode tab switcher */}
@@ -492,13 +492,13 @@ export default function Home() {
             textAlign: "center", letterSpacing: "-0.03em",
             marginBottom: "16px", color: "#ededff",
           }}>
-            1000s of <span className="gradient-text">workflows.</span>
+            1000s of <span className="gradient-text">pipelines.</span>
           </h2>
           <p style={{
             textAlign: "center", color: "#7878a8", fontSize: "17px",
             maxWidth: "480px", margin: "0 auto 56px", lineHeight: 1.65,
           }}>
-            Pre-built pipelines across research, biology, model training, and writing — ready to run or adapt.
+            Ready-to-run pipelines spanning research, biology, model training, and writing — use them as-is or adapt them.
           </p>
 
           {/* Search bar (decorative) */}
@@ -509,7 +509,7 @@ export default function Home() {
             maxWidth: "500px", margin: "0 auto 40px",
           }}>
             <span style={{ color: "#4a4a6a", fontSize: "14px" }}>⌕</span>
-            <span style={{ color: "#4a4a6a", fontSize: "14px" }}>Search 1000+ workflows...</span>
+            <span style={{ color: "#4a4a6a", fontSize: "14px" }}>Search 1000+ pipelines...</span>
           </div>
 
           <div style={{
@@ -535,7 +535,7 @@ export default function Home() {
                   display: "flex", alignItems: "center", gap: "4px",
                   marginTop: "16px", fontSize: "12px", color: w.color, fontWeight: 600,
                 }}>
-                  <Play size={11} fill={w.color} /> Run workflow
+                  <Play size={11} fill={w.color} /> Launch workflow
                 </div>
               </div>
             ))}
@@ -549,7 +549,7 @@ export default function Home() {
               border: "1px solid rgba(255,255,255,0.12)",
               background: "rgba(255,255,255,0.05)",
             }}>
-              Browse all workflows <ArrowRight size={14} />
+              View all workflows <ArrowRight size={14} />
             </a>
           </div>
         </div>
@@ -564,23 +564,23 @@ export default function Home() {
         <div className="mobile-col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "80px", alignItems: "center" }}>
           {/* Left */}
           <div>
-            <SectionLabel>Universal Sync</SectionLabel>
+            <SectionLabel>One-Time Setup</SectionLabel>
             <h2 style={{
               fontSize: "clamp(28px, 3.5vw, 46px)", fontWeight: 800,
               letterSpacing: "-0.03em", marginBottom: "20px", color: "#ededff",
               lineHeight: 1.15,
             }}>
-              Your Credentials.<br /><span className="gradient-text">Your Compute.</span>
+              Your Keys.<br /><span className="gradient-text">Your Compute.</span>
             </h2>
             <p style={{ fontSize: "16px", color: "#7878a8", lineHeight: 1.7, marginBottom: "36px" }}>
-              Connect once on the dashboard. GitHub, Hugging Face, Weights & Biases,
-              and other API keys automatically sync to every agent and every session.
+              Set up once in the dashboard. Your GitHub, Hugging Face, Weights & Biases,
+              and other API keys automatically flow to every agent and session.
             </p>
 
             {[
-              { icon: Lock, label: "Universal Credential Sync", desc: "Connect once. Credentials sync to every agent automatically." },
-              { icon: Cpu, label: "GPU Orchestration", desc: "Provision compute clusters across multiple providers seamlessly." },
-              { icon: Layers, label: "Deep Integrations", desc: "Connect your stack once and coordinate research execution across repos, experiments, and cloud runtimes." },
+              { icon: Lock, label: "Single-Setup Credentials", desc: "Link once and credentials propagate to every agent on their own." },
+              { icon: Cpu, label: "GPU Coordination", desc: "Spin up compute clusters across providers without friction." },
+              { icon: Layers, label: "Full-Stack Integration", desc: "Wire up your stack once and run research across repos, experiments, and cloud compute from one place." },
             ].map(f => (
               <div key={f.label} style={{ display: "flex", gap: "16px", marginBottom: "24px" }}>
                 <div style={{
@@ -635,16 +635,16 @@ export default function Home() {
             background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)",
           }}>
             <Zap size={14} color="#10b981" />
-            <span style={{ fontSize: "12px", fontWeight: 700, color: "#10b981", letterSpacing: "0.06em" }}>ZERO SETUP OVERHEAD</span>
+            <span style={{ fontSize: "12px", fontWeight: 700, color: "#10b981", letterSpacing: "0.06em" }}>NO CONFIGURATION NEEDED</span>
           </div>
           <h2 style={{
             fontSize: "clamp(28px, 3.5vw, 42px)", fontWeight: 800, letterSpacing: "-0.03em",
             color: "#ededff", marginBottom: "16px",
           }}>
-            Start researching immediately.
+            Jump straight into research.
           </h2>
           <p style={{ fontSize: "17px", color: "#7878a8", lineHeight: 1.7, maxWidth: "560px", margin: "0 auto" }}>
-            Everything from package dependencies to Python environments is fully managed
+            Package dependencies, Python environments — all of it is handled
             by our sandboxed runtime. No setup. No config. Just research.
           </p>
         </div>
@@ -656,20 +656,20 @@ export default function Home() {
         padding: "120px 24px",
         maxWidth: "1200px", margin: "0 auto",
       }}>
-        <SectionLabel>Persistent Runtime</SectionLabel>
+        <SectionLabel>Always-On Runtime</SectionLabel>
         <h2 style={{
           fontSize: "clamp(32px, 4vw, 52px)", fontWeight: 800,
           textAlign: "center", letterSpacing: "-0.03em",
           marginBottom: "16px", color: "#ededff",
         }}>
-          Agents that <span className="gradient-text">never stop.</span>
+          Agents that <span className="gradient-text">keep going.</span>
         </h2>
         <p style={{
           textAlign: "center", color: "#7878a8", fontSize: "17px",
           maxWidth: "520px", margin: "0 auto 72px", lineHeight: 1.65,
         }}>
-          Keep long-running workflows alive in persistent browser runtimes. Start a training run or
-          literature review, walk away, and your agents continue execution autonomously.
+          Persistent runtimes keep long-running workflows alive in the browser. Kick off a training run or
+          literature review, step away, and your agents carry on without you.
         </p>
 
         <div className="mobile-col" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
@@ -722,16 +722,16 @@ export default function Home() {
         }} />
         <div className="mobile-col" style={{ maxWidth: "900px", margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "80px", alignItems: "center" }}>
           <div>
-            <Badge color="#3b82f6">Research Infrastructure</Badge>
+            <Badge color="#3b82f6">Research-Grade Infrastructure</Badge>
             <h2 style={{
               fontSize: "clamp(26px, 3vw, 40px)", fontWeight: 800, letterSpacing: "-0.03em",
               color: "#ededff", marginTop: "20px", marginBottom: "16px", lineHeight: 1.2,
             }}>
-              Long-Horizon RL Environments for Scientific Research.
+              Long-Horizon RL Environments Built for Scientific Work.
             </h2>
             <p style={{ fontSize: "15.5px", color: "#7878a8", lineHeight: 1.75, marginBottom: "28px" }}>
-              Develop RL environments and process-based training data for LLMs, starting with
-              agentic coding environments for ML research workflows.
+              Build RL environments and process-based training data for LLMs — beginning with
+              agentic coding environments designed for ML research workflows.
             </p>
             <a href="/dashboard" style={{
               display: "inline-flex", alignItems: "center", gap: "8px",
@@ -740,16 +740,16 @@ export default function Home() {
               border: "1px solid rgba(59,130,246,0.3)",
               background: "rgba(59,130,246,0.08)",
             }}>
-              Start building <ArrowRight size={14} />
+              Begin building <ArrowRight size={14} />
             </a>
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
             {[
-              { icon: Terminal, label: "Agentic coding environments", color: "#3b82f6" },
-              { icon: TrendingUp, label: "Process-based reward signals", color: "#8b5cf6" },
-              { icon: BarChart3, label: "Automated evaluation pipelines", color: "#10b981" },
-              { icon: Globe, label: "Multi-agent coordination", color: "#f59e0b" },
+              { icon: Terminal, label: "AI-driven coding environments", color: "#3b82f6" },
+              { icon: TrendingUp, label: "Process-level reward signals", color: "#8b5cf6" },
+              { icon: BarChart3, label: "End-to-end evaluation pipelines", color: "#10b981" },
+              { icon: Globe, label: "Coordinated multi-agent systems", color: "#f59e0b" },
             ].map(f => {
               const Icon = f.icon
               return (
@@ -786,7 +786,7 @@ export default function Home() {
             background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.2)",
             fontSize: "12px", fontWeight: 700, color: "#8b5cf6", letterSpacing: "0.06em",
           }}>
-            FROM THE FOUNDER
+            A NOTE FROM THE FOUNDER
           </div>
 
           <div style={{
@@ -806,25 +806,25 @@ export default function Home() {
               marginBottom: "24px", position: "relative", zIndex: 1,
               paddingTop: "24px",
             }}>
-              I built Veil because I kept switching between five different tools just to do one research task —
+              I created Veil because I kept jumping between five separate tools just to complete a single research task —
               reading papers in one tab, running models in another, writing in a third.
-              Every switch broke my flow and killed my context.
+              Every switch shattered my flow and wiped my context.
             </p>
             <p style={{
               fontSize: "17px", color: "#7878a8", lineHeight: 1.85,
               marginBottom: "36px",
             }}>
-              Researchers and ML engineers deserve a workspace where the AI understands the <em style={{ color: "#ededff" }}>entire</em> context of their work —
-              not just the last message. That&apos;s what Veil is. One workspace, four deep modes, thousands of workflows,
-              your compute — all in one place, always in sync.
+              Researchers and ML engineers deserve a workspace where the AI holds the <em style={{ color: "#ededff" }}>full</em> context of their work —
+              not just the last message. That&apos;s what Veil is. One unified workspace, four specialized modes, thousands of workflows,
+              your own compute — all together, always in sync.
             </p>
 
             <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-              <img src="/logo.png" alt="Veil" style={{ width: "48px", height: "48px", objectFit: "contain", flexShrink: 0 }} />
+              <img src="/logo-transparent.png" alt="Veil" style={{ width: "48px", height: "48px", objectFit: "contain", flexShrink: 0, filter: "invert(1)" }} />
               <div>
                 <div style={{ fontSize: "15px", fontWeight: 800, color: "#ededff" }}>Vibhor Pandey</div>
                 <div style={{ fontSize: "13px", color: "#7878a8", marginTop: "2px" }}>
-                  Founder, Veil Research · UPES University, Dehradun
+                  Founder, Veil Research — UPES University, Dehradun
                 </div>
                 <a
                   href="mailto:vibhorpandey09@gmail.com"
@@ -856,13 +856,13 @@ export default function Home() {
             fontSize: "clamp(36px, 5vw, 64px)", fontWeight: 800,
             letterSpacing: "-0.04em", marginBottom: "20px",
           }}>
-            <span className="gradient-text">Research faster.</span>
+            <span className="gradient-text">Research smarter.</span>
             <br />
-            <span style={{ color: "#ededff" }}>Ship better models.</span>
+            <span style={{ color: "#ededff" }}>Build stronger models.</span>
           </h2>
           <p style={{ fontSize: "17px", color: "#7878a8", marginBottom: "48px", lineHeight: 1.7 }}>
-            Join researchers who are running experiments, reviewing papers,<br />
-            and training models — all in one continuous workspace.
+            Join researchers who are running experiments, reviewing literature,<br />
+            and training models — all inside one seamless workspace.
           </p>
           <div style={{ display: "flex", gap: "14px", justifyContent: "center", flexWrap: "wrap" }}>
             <a href="/dashboard" style={{
@@ -871,7 +871,7 @@ export default function Home() {
               background: "linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%)",
               boxShadow: "0 0 40px rgba(139,92,246,0.4)",
             }}>
-              Open Dashboard →
+              Launch Dashboard →
             </a>
             <a href="#modes" style={{
               padding: "15px 36px", borderRadius: "14px", fontSize: "16px",
@@ -879,7 +879,7 @@ export default function Home() {
               border: "1px solid rgba(255,255,255,0.12)",
               background: "rgba(255,255,255,0.04)",
             }}>
-              Explore Modes
+              Browse Modes
             </a>
           </div>
         </div>
@@ -894,7 +894,7 @@ export default function Home() {
         flexWrap: "wrap", gap: "16px",
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <img src="/logo.png" alt="Veil" style={{ width: "26px", height: "26px", objectFit: "contain" }} />
+          <img src="/logo-transparent.png" alt="Veil" style={{ width: "26px", height: "26px", objectFit: "contain", filter: "invert(1)" }} />
           <span style={{ fontSize: "14px", fontWeight: 700, color: "#7878a8" }}>Veil Research</span>
         </div>
         <div style={{ display: "flex", gap: "28px" }}>
@@ -906,7 +906,7 @@ export default function Home() {
             <a key={link.label} href={link.href} style={{ fontSize: "13px", color: "#4a4a6a", textDecoration: "none" }}>{link.label}</a>
           ))}
         </div>
-        <span style={{ fontSize: "12.5px", color: "#4a4a6a" }}>© 2025 Veil Research. All rights reserved.</span>
+        <span style={{ fontSize: "12.5px", color: "#4a4a6a" }}>© 2026 Veil Research. All rights reserved.</span>
       </footer>
     </div>
   )

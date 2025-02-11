@@ -1,10 +1,17 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { createClient } from "@supabase/supabase-js"
 import {
   Check, Crown, BookOpen, Dna, RefreshCw, PenLine,
   Mail, X, ArrowRight, Zap, Star,
 } from "lucide-react"
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+)
 
 const FEATURES = [
   "Unlimited chat messages",
@@ -15,7 +22,7 @@ const FEATURES = [
   "Biology mode — protein & genomics",
   "Flywheel mode — auto fine-tuning",
   "Write mode — LaTeX & manuscripts",
-  "1000s of pre-built workflows",
+  "1000s of pre-built pipelines",
   "GPU compute orchestration",
   "Persistent agent runtime",
   "GitHub, HuggingFace, W&B integrations",
@@ -25,27 +32,27 @@ const FEATURES = [
 const FAQS = [
   {
     q: "What is Early Access pricing?",
-    a: "Early Access is a limited-time offer for the first users who join Veil. You lock in ₹199/month forever — even after we raise prices. Once the early access spots fill up, pricing moves to ₹699/month.",
+    a: "Early Access is a limited-time offer for the first users who join Veil. You lock in ₹199/month permanently — even after we increase prices. Once all early access spots are taken, pricing moves to ₹699/month.",
   },
   {
     q: "When will payments be available?",
-    a: "We're setting up our payment infrastructure. Join the early access list and you'll be the first to know — plus you'll lock in ₹199/month permanently.",
+    a: "We're building out our payment infrastructure. Join the early access list and you'll hear from us first — plus you'll lock in ₹199/month for good.",
   },
   {
     q: "How much do I save on the annual plan?",
-    a: "The annual plan is ₹8099/year vs ₹8388/year (₹699 × 12) — saving you ₹289. You also get priority access and early feature releases.",
+    a: "The annual plan is ₹8099/year versus ₹8388/year (₹699 × 12) — that's ₹289 in savings. You also get priority access and early feature releases.",
   },
   {
     q: "Which payment methods will be accepted?",
-    a: "UPI, credit/debit cards, and net banking via a secure Indian payment gateway.",
+    a: "UPI, credit and debit cards, and net banking via a secure Indian payment gateway.",
   },
   {
     q: "Can I cancel anytime?",
-    a: "Yes. Cancel from your dashboard at any time. You keep access until the end of your billing period.",
+    a: "Yes. Cancel from your dashboard whenever you like. Your access continues until the end of your billing period.",
   },
   {
     q: "Is my data private?",
-    a: "Yes. Your conversations and credentials are encrypted and never used to train models.",
+    a: "Yes. Your conversations and credentials are encrypted and are never used to train any model.",
   },
 ]
 
@@ -57,7 +64,7 @@ const PLANS = [
     badgeColor: "#f59e0b",
     price: "₹199",
     period: "/month",
-    sub: "Lock in forever — price never increases for you",
+    sub: "Locked in forever — your price never goes up",
     highlight: false,
     icon: Star,
     iconColor: "#f59e0b",
@@ -74,7 +81,7 @@ const PLANS = [
     badgeColor: "#8b5cf6",
     price: "₹699",
     period: "/month",
-    sub: "Full access, billed monthly",
+    sub: "Complete access, billed every month",
     highlight: true,
     icon: Crown,
     iconColor: "#8b5cf6",
@@ -148,7 +155,7 @@ function EarlyAccessModal({ plan, onClose }: { plan: typeof PLANS[0]; onClose: (
             </div>
             <h2 style={{ fontSize: "20px", fontWeight: 800, color: "#ededff", marginBottom: "10px" }}>You&apos;re on the list!</h2>
             <p style={{ fontSize: "14px", color: "#7878a8", lineHeight: 1.7 }}>
-              We&apos;ll email you at <strong style={{ color: "#ededff" }}>{email}</strong> the moment payments go live.
+              We&apos;ll reach out at <strong style={{ color: "#ededff" }}>{email}</strong> as soon as payments go live.
               Your <strong style={{ color: plan.iconColor }}>{plan.name}</strong> spot is reserved.
             </p>
           </div>
@@ -166,8 +173,8 @@ function EarlyAccessModal({ plan, onClose }: { plan: typeof PLANS[0]; onClose: (
               {plan.name} — {plan.price}{plan.period}
             </h2>
             <p style={{ fontSize: "14px", color: "#7878a8", lineHeight: 1.65, marginBottom: "24px" }}>
-              Payments are launching soon. Drop your email to reserve your spot at this price —
-              you&apos;ll be notified the moment it goes live.
+              Payments are launching soon. Enter your email to hold your spot at this price —
+              we&apos;ll let you know the moment it&apos;s ready.
             </p>
 
             <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "24px" }}>
@@ -215,13 +222,123 @@ function EarlyAccessModal({ plan, onClose }: { plan: typeof PLANS[0]; onClose: (
   )
 }
 
+function loadRazorpayScript(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (typeof window !== "undefined" && (window as any).Razorpay) {
+      resolve()
+      return
+    }
+    const script = document.createElement("script")
+    script.src = "https://checkout.razorpay.com/v1/checkout.js"
+    script.onload = () => resolve()
+    script.onerror = () => reject(new Error("Failed to load Razorpay SDK"))
+    document.body.appendChild(script)
+  })
+}
+
 export default function Pricing() {
-  const [activePlan, setActivePlan] = useState<typeof PLANS[0] | null>(null)
-  const [openFaq,    setOpenFaq]    = useState<number | null>(null)
+  const router = useRouter()
+  const [activePlan,    setActivePlan]    = useState<typeof PLANS[0] | null>(null)
+  const [openFaq,       setOpenFaq]       = useState<number | null>(null)
+  const [payLoading,    setPayLoading]    = useState(false)
+  const [paySuccess,    setPaySuccess]    = useState(false)
+
+  const handleSubscribe = async (planId: string) => {
+    setPayLoading(true)
+    try {
+      // 1. Get Supabase session
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        router.push("/login?next=/pricing")
+        return
+      }
+      const token = session.access_token
+      const userEmail = session.user.email ?? ""
+
+      // 2. Create Razorpay subscription on our backend
+      const subRes = await fetch("/api/razorpay/subscription", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify({ planId }),
+      })
+      if (!subRes.ok) {
+        const err = await subRes.json().catch(() => ({}))
+        throw new Error(err?.error ?? "Failed to create subscription")
+      }
+      const { subscriptionId, keyId } = await subRes.json()
+
+      // 3. Load Razorpay SDK if not already loaded
+      await loadRazorpayScript()
+
+      // 4. Open Razorpay checkout modal
+      const options = {
+        key: keyId,
+        subscription_id: subscriptionId,
+        name: "Veil Research",
+        description: "Early Access — ₹199/month",
+        image: "/logo.png",
+        theme: { color: "#8b5cf6" },
+        prefill: { email: userEmail },
+        handler: async (response: {
+          razorpay_payment_id: string
+          razorpay_subscription_id: string
+          razorpay_signature: string
+        }) => {
+          // 5. Verify payment on our backend
+          const verifyRes = await fetch("/api/razorpay/verify", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_subscription_id: response.razorpay_subscription_id,
+              razorpay_signature: response.razorpay_signature,
+            }),
+          })
+          if (!verifyRes.ok) {
+            const err = await verifyRes.json().catch(() => ({}))
+            throw new Error(err?.error ?? "Payment verification failed")
+          }
+          // 6. Show success briefly, then redirect
+          setPaySuccess(true)
+          setTimeout(() => router.push("/dashboard"), 2000)
+        },
+      }
+
+      const rzp = new (window as any).Razorpay(options)
+      rzp.open()
+    } catch (err: any) {
+      console.error("Razorpay error:", err)
+      alert(err?.message ?? "Something went wrong. Please try again.")
+    } finally {
+      setPayLoading(false)
+    }
+  }
 
   return (
     <div style={{ background: "#050508", minHeight: "100vh", color: "#ededff" }}>
       {activePlan && <EarlyAccessModal plan={activePlan} onClose={() => setActivePlan(null)} />}
+
+      {/* ── Payment success toast ─────────────────────────────────────── */}
+      {paySuccess && (
+        <div style={{
+          position: "fixed", top: "24px", left: "50%", transform: "translateX(-50%)",
+          zIndex: 300, padding: "14px 28px", borderRadius: "14px",
+          background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.4)",
+          backdropFilter: "blur(12px)", display: "flex", alignItems: "center", gap: "10px",
+          boxShadow: "0 0 40px rgba(16,185,129,0.2)",
+        }}>
+          <Check size={18} color="#10b981" />
+          <span style={{ fontSize: "14px", fontWeight: 700, color: "#ededff" }}>
+            Payment successful! Redirecting to dashboard…
+          </span>
+        </div>
+      )}
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <section style={{
@@ -241,15 +358,15 @@ export default function Pricing() {
           fontSize: "clamp(36px, 5vw, 60px)", fontWeight: 800,
           letterSpacing: "-0.04em", marginBottom: "16px", lineHeight: 1.05,
         }}>
-          Simple, transparent pricing.
+          Clear, honest pricing.
           <br />
           <span style={{
             background: "linear-gradient(135deg, #ededff 0%, #a78bfa 45%, #38bdf8 100%)",
             WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-          }}>Lock in early. Pay less forever.</span>
+          }}>Get in early. Pay less forever.</span>
         </h1>
         <p style={{ fontSize: "17px", color: "#7878a8", maxWidth: "500px", margin: "0 auto", lineHeight: 1.7 }}>
-          Join now at ₹199/month and that price is yours permanently —
+          Sign up now at ₹199/month and that rate stays yours permanently —
           even after we move to standard pricing.
         </p>
       </section>
@@ -300,26 +417,22 @@ export default function Pricing() {
                 <p style={{ fontSize: "13px", color: "#7878a8", marginBottom: "28px", lineHeight: 1.5 }}>{plan.sub}</p>
 
                 {/* CTA */}
-                <button onClick={() => setActivePlan(plan)} style={{
-                  width: "100%", padding: "13px", borderRadius: "12px", border: "none",
-                  fontSize: "14px", fontWeight: 700, color: "#fff", cursor: "pointer",
-                  background: plan.ctaGradient,
-                  boxShadow: plan.highlight ? `0 0 30px ${plan.glowColor}` : "none",
-                  marginBottom: "28px",
-                }}>
-                  {plan.ctaLabel}
+                <button
+                  onClick={() => handleSubscribe(plan.id)}
+                  disabled={payLoading}
+                  style={{
+                    width: "100%", padding: "13px", borderRadius: "12px", border: "none",
+                    fontSize: "14px", fontWeight: 700, color: "#fff",
+                    cursor: payLoading ? "not-allowed" : "pointer",
+                    background: plan.ctaGradient,
+                    boxShadow: plan.highlight ? `0 0 30px ${plan.glowColor}` : "none",
+                    marginBottom: "28px",
+                    opacity: payLoading ? 0.75 : 1,
+                    display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
+                  }}
+                >
+                  {payLoading ? "Processing…" : plan.ctaLabel}
                 </button>
-
-                {/* Coming soon note */}
-                <div style={{
-                  display: "flex", alignItems: "center", gap: "6px",
-                  padding: "8px 12px", borderRadius: "9px", marginBottom: "24px",
-                  background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)",
-                  fontSize: "12px", color: "#4a4a6a",
-                }}>
-                  <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#f59e0b", display: "inline-block" }} />
-                  Payments launching soon — reserve your spot
-                </div>
 
                 {/* Features */}
                 <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: "20px" }}>
@@ -348,7 +461,7 @@ export default function Pricing() {
         }}>
           <p style={{ fontSize: "14px", color: "#7878a8", lineHeight: 1.7 }}>
             <span style={{ color: "#f59e0b", fontWeight: 700 }}>Early Access spots are limited.</span>{" "}
-            Join now to lock in ₹199/month permanently — once spots fill, pricing moves to ₹699/month.
+            Claim yours now to lock in ₹199/month permanently — once spots run out, pricing moves to ₹699/month.
           </p>
         </div>
       </section>
@@ -387,7 +500,7 @@ export default function Pricing() {
       {/* ── FAQ ──────────────────────────────────────────────────────────── */}
       <section style={{ padding: "40px 24px 100px", maxWidth: "640px", margin: "0 auto" }}>
         <h2 style={{ fontSize: "26px", fontWeight: 800, letterSpacing: "-0.02em", marginBottom: "28px", textAlign: "center", color: "#ededff" }}>
-          Common questions
+          Frequently asked questions
         </h2>
         <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
           {FAQS.map((faq, i) => (
@@ -415,17 +528,24 @@ export default function Pricing() {
 
         <div style={{ textAlign: "center", marginTop: "48px" }}>
           <p style={{ fontSize: "14px", color: "#7878a8", marginBottom: "20px" }}>
-            Questions?{" "}
+            Have a question?{" "}
             <a href="mailto:vibhorpandey09@gmail.com" style={{ color: "#8b5cf6", textDecoration: "none" }}>
               vibhorpandey09@gmail.com →
             </a>
           </p>
-          <button onClick={() => setActivePlan(PLANS[0])} style={{
-            padding: "13px 32px", borderRadius: "12px", border: "none",
-            fontSize: "15px", fontWeight: 700, color: "#fff", cursor: "pointer",
-            background: "linear-gradient(135deg, #f59e0b, #ef4444)",
-          }}>
-            Lock in Early Access — ₹199/month →
+          <button
+            onClick={() => handleSubscribe("early")}
+            disabled={payLoading}
+            style={{
+              padding: "13px 32px", borderRadius: "12px", border: "none",
+              fontSize: "15px", fontWeight: 700, color: "#fff",
+              cursor: payLoading ? "not-allowed" : "pointer",
+              background: "linear-gradient(135deg, #f59e0b, #ef4444)",
+              opacity: payLoading ? 0.75 : 1,
+              display: "inline-flex", alignItems: "center", gap: "8px",
+            }}
+          >
+            {payLoading ? "Processing…" : "Claim Early Access — ₹199/month →"}
           </button>
         </div>
       </section>

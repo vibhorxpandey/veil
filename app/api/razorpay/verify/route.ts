@@ -1,13 +1,25 @@
-import { NextResponse } from "next/server"
-import { createSupabaseServer } from "@/lib/supabase-server"
+import { NextRequest, NextResponse } from "next/server"
+import { createClient } from "@supabase/supabase-js"
 import crypto from "crypto"
 
 export const dynamic = "force-dynamic"
 
-export async function POST(req: Request) {
-  const supabase = await createSupabaseServer()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+export async function POST(req: NextRequest) {
+  const token = req.headers.get("authorization")?.replace("Bearer ", "").trim()
+  if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+  const anon = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  )
+  const { data: { user }, error } = await anon.auth.getUser(token)
+  if (error || !user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${token}` } } },
+  )
 
   const { razorpay_payment_id, razorpay_subscription_id, razorpay_signature } =
     await req.json()

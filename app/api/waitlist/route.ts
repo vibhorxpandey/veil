@@ -109,8 +109,16 @@ const gratitudeEmail = (email: string) => `
 `
 
 export async function POST(req: Request) {
-  const { email } = await req.json()
-  if (!email) return NextResponse.json({ error: "Email required" }, { status: 400 })
+  const body = await req.json().catch(() => null)
+  if (!body) return NextResponse.json({ error: "Invalid request body" }, { status: 400 })
+
+  const { email } = body
+  if (!email || typeof email !== "string") return NextResponse.json({ error: "Email required" }, { status: 400 })
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(email) || email.length > 254) {
+    return NextResponse.json({ error: "Invalid email address" }, { status: 400 })
+  }
 
   // Save to Supabase waitlist table (best effort)
   try {

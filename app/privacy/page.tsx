@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "Privacy Policy — Veil Research",
-  description: "Privacy Policy for Veil Research platform — how we collect, use, and protect your data.",
+  description: "Privacy Policy for Veil Research — how we collect, use, and protect your data.",
 }
 
 const LAST_UPDATED = "28 April 2025"
@@ -27,8 +27,8 @@ export default function Privacy() {
           </h1>
           <p style={{ fontSize: "14px", color: "#4a4a6a" }}>Last updated: {LAST_UPDATED}</p>
           <p style={{ fontSize: "15px", color: "#7878a8", marginTop: "16px", lineHeight: 1.7, maxWidth: "600px" }}>
-            Your privacy matters to us. This policy explains what data we collect, why we collect it,
-            how we use it, and your rights over your information.
+            Your privacy is important to us. This policy explains what data we collect, why we collect it,
+            how we use it, and what rights you have over your information.
           </p>
         </div>
 
@@ -36,7 +36,7 @@ export default function Privacy() {
 
           <Section title="1. Who We Are">
             <P>Veil Research ("Veil", "we", "us") is an AI research platform operated by Vibhor Pandey, based in Dehradun, Uttarakhand, India. Our platform is accessible at veilresearch.com.</P>
-            <P>For any privacy-related concerns, contact us at <a href="mailto:vibhorpandey09@gmail.com" style={{ color: "#8b5cf6", textDecoration: "none" }}>vibhorpandey09@gmail.com</a>.</P>
+            <P>For any privacy-related questions, contact us at <a href="mailto:vibhorpandey09@gmail.com" style={{ color: "#8b5cf6", textDecoration: "none" }}>vibhorpandey09@gmail.com</a>.</P>
           </Section>
 
           <Section title="2. Information We Collect">
@@ -46,7 +46,7 @@ export default function Privacy() {
                 <li><strong style={{ color: "#ededff" }}>Password</strong> — stored as a secure hash via Supabase; we never see your raw password</li>
                 <li><strong style={{ color: "#ededff" }}>Display name</strong> — optionally set in your profile settings</li>
                 <li><strong style={{ color: "#ededff" }}>Chat messages</strong> — text you send to AI models within the platform</li>
-                <li><strong style={{ color: "#ededff" }}>API keys</strong> — third-party API keys you optionally connect (stored locally in your browser; not sent to our servers)</li>
+                <li><strong style={{ color: "#ededff" }}>API keys</strong> — third-party API keys you optionally connect (stored locally in your browser; never sent to our servers)</li>
               </ul>
             </SubSection>
 
@@ -55,7 +55,7 @@ export default function Privacy() {
                 <li><strong style={{ color: "#ededff" }}>Usage data</strong> — which models you use, how many messages you send, which modes you activate</li>
                 <li><strong style={{ color: "#ededff" }}>Subscription status</strong> — your plan tier, trial usage, and billing status</li>
                 <li><strong style={{ color: "#ededff" }}>Session data</strong> — authentication tokens stored in browser cookies and localStorage</li>
-                <li><strong style={{ color: "#ededff" }}>Technical data</strong> — browser type, device type, IP address (collected by Vercel infrastructure)</li>
+                <li><strong style={{ color: "#ededff" }}>Technical data</strong> — browser type, device type, and IP address (collected by Vercel infrastructure)</li>
               </ul>
             </SubSection>
 
@@ -63,7 +63,7 @@ export default function Privacy() {
               <ul style={listStyle}>
                 <li>We do not collect your phone number unless you provide it</li>
                 <li>We do not collect payment card details — all payments are handled directly by Razorpay</li>
-                <li>We do not collect your third-party API keys on our servers</li>
+                <li>We do not store your third-party API keys on our servers</li>
                 <li>We do not collect biometric data</li>
               </ul>
             </SubSection>
@@ -72,10 +72,10 @@ export default function Privacy() {
           <Section title="3. How We Use Your Information">
             <P>We use the information we collect to:</P>
             <ul style={listStyle}>
-              <li>Create and manage your account and authenticate your identity</li>
+              <li>Create and manage your account and verify your identity</li>
               <li>Deliver AI model responses and process your chat messages</li>
               <li>Track your free trial usage per AI model to enforce trial limits</li>
-              <li>Process subscription payments and manage your billing through Razorpay</li>
+              <li>Process subscription payments and manage billing through Razorpay</li>
               <li>Send transactional emails including login links and waitlist confirmations via Resend</li>
               <li>Improve the platform based on usage patterns and feedback</li>
               <li>Detect and prevent fraud, abuse, and security incidents</li>
@@ -85,7 +85,7 @@ export default function Privacy() {
           </Section>
 
           <Section title="4. How We Share Your Information">
-            <P>We share your data only with the following categories of third parties, strictly as necessary to operate the service:</P>
+            <P>We share your data only with the following categories of third parties, strictly as needed to operate the service:</P>
 
             <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginTop: "4px" }}>
               {[
@@ -109,26 +109,26 @@ export default function Privacy() {
 
           <Section title="5. Data Storage and Security">
             <P>Your data is stored on Supabase infrastructure hosted on AWS in secure data centres. All data in transit is encrypted using TLS/HTTPS. Passwords are hashed using industry-standard algorithms and are never stored in plain text.</P>
-            <P>Row-level security (RLS) policies are enforced at the database level — your data is accessible only by your authenticated account. No other user can access your data.</P>
-            <P>While we implement industry-standard security measures, no method of transmission over the Internet is 100% secure. We cannot guarantee absolute security of your data.</P>
+            <P>Row-level security (RLS) policies are enforced at the database level — your data is accessible only by your authenticated account. No other user can view your data.</P>
+            <P>While we implement industry-standard security measures, no method of transmission over the internet is 100% secure. We cannot guarantee the absolute security of your data.</P>
           </Section>
 
           <Section title="6. Cookies and Local Storage">
             <P>Veil uses the following browser storage mechanisms:</P>
             <ul style={listStyle}>
               <li><strong style={{ color: "#ededff" }}>Authentication cookies</strong> — set by Supabase to maintain your login session across page loads. These are essential and cannot be disabled without logging out.</li>
-              <li><strong style={{ color: "#ededff" }}>localStorage</strong> — used to store your display name and optionally entered third-party API keys (OpenAI, NVIDIA) on your device only. This data is never sent to our servers.</li>
+              <li><strong style={{ color: "#ededff" }}>localStorage</strong> — used to store your display name and any third-party API keys you optionally enter (OpenAI, NVIDIA) on your device only. This data is never sent to our servers.</li>
             </ul>
             <P>We do not use advertising cookies, cross-site tracking cookies, or analytics cookies from third-party ad networks.</P>
           </Section>
 
           <Section title="7. Data Retention">
-            <P>We retain your data for as long as your account is active. If you delete your account:</P>
+            <P>We retain your data for as long as your account remains active. If you delete your account:</P>
             <ul style={listStyle}>
               <li>Your authentication data is deleted immediately from Supabase</li>
               <li>Your chat messages and usage data are deleted within 30 days</li>
               <li>Your subscription and billing records may be retained for up to 7 years as required by Indian financial regulations</li>
-              <li>Your waitlist email, if submitted, is retained unless you request removal</li>
+              <li>Your waitlist email, if submitted, is retained unless you request its removal</li>
             </ul>
           </Section>
 

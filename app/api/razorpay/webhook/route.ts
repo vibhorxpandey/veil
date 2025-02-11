@@ -25,13 +25,17 @@ export async function POST(req: NextRequest) {
   }
 
   const admin = getAdmin()
-  const event = JSON.parse(body) as { event: string; payload: Record<string, unknown> }
+  let event: { event: string; payload: Record<string, unknown> }
+  try {
+    event = JSON.parse(body)
+  } catch {
+    return NextResponse.json({ error: "Invalid payload" }, { status: 400 })
+  }
 
   const subscriptionId =
     (event.payload?.subscription as Record<string, unknown>)?.entity as Record<string, unknown>
 
-  const subId     = subscriptionId?.id as string | undefined
-  const subStatus = subscriptionId?.status as string | undefined
+  const subId = subscriptionId?.id as string | undefined
 
   if (event.event === "subscription.charged") {
     if (subId) {
