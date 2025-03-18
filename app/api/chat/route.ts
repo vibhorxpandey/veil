@@ -58,9 +58,21 @@ export async function POST(req: Request) {
   try {
     const completion = await client.chat.completions.create({ model: cfg.model, messages, max_tokens: 2048 })
     reply = completion.choices[0]?.message?.content ?? ""
-  } catch {
-    const fallback = await getOpenAI().chat.completions.create({ model: "gpt-4o-mini", messages, max_tokens: 2048 })
-    reply = fallback.choices[0]?.message?.content ?? ""
+  } catch (err: unknown) {
+    const status = (err as { status?: number })?.status
+    if (status === 429) {
+      return NextResponse.json({ error: "QUOTA_EXCEEDED" }, { status: 429 })
+    }
+    try {
+      const fallback = await getOpenAI().chat.completions.create({ model: "gpt-4o-mini", messages, max_tokens: 2048 })
+      reply = fallback.choices[0]?.message?.content ?? ""
+    } catch (fallbackErr: unknown) {
+      const fallbackStatus = (fallbackErr as { status?: number })?.status
+      if (fallbackStatus === 429) {
+        return NextResponse.json({ error: "QUOTA_EXCEEDED" }, { status: 429 })
+      }
+      return NextResponse.json({ error: "AI_ERROR" }, { status: 500 })
+    }
   }
 
   if (!isSubscribed) {

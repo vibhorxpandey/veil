@@ -95,23 +95,32 @@ function SessionsView({
     setInput("")
     setLoading(true)
 
-    const res  = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${accessToken}` },
-      body: JSON.stringify({ messages: updated, model }),
-    })
-    const data = await res.json()
+    try {
+      const res  = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${accessToken}` },
+        body: JSON.stringify({ messages: updated, model }),
+      })
+      const data = await res.json()
 
-    if (data.error === "UPGRADE_REQUIRED") {
-      setTrialUsed(t => [...new Set([...t, model])])
-      setShowGate(true)
+      if (data.error === "UPGRADE_REQUIRED") {
+        setTrialUsed(t => [...new Set([...t, model])])
+        setShowGate(true)
+        return
+      }
+
+      if (data.error === "QUOTA_EXCEEDED" || data.error === "AI_ERROR") {
+        setAllMsgs(m => ({ ...m, [model]: [...updated, { role: "assistant", content: "Service temporarily unavailable. Please try again shortly." }] }))
+        return
+      }
+
+      setAllMsgs(m => ({ ...m, [model]: [...updated, { role: "assistant", content: data.reply ?? "No response — please try again." }] }))
+      if (data.trialModelsUsed) setTrialUsed(data.trialModelsUsed)
+    } catch {
+      setAllMsgs(m => ({ ...m, [model]: [...updated, { role: "assistant", content: "Something went wrong. Please try again." }] }))
+    } finally {
       setLoading(false)
-      return
     }
-
-    setAllMsgs(m => ({ ...m, [model]: [...updated, { role: "assistant", content: data.reply }] }))
-    if (data.trialModelsUsed) setTrialUsed(data.trialModelsUsed)
-    setLoading(false)
   }
 
   return (
