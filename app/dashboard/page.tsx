@@ -66,8 +66,8 @@ const MOCK_NOTIFS = [
 // ─── Sub-views ────────────────────────────────────────────────────────────────
 
 function SessionsView({
-  trialModelsUsed, isPro, userEmail,
-}: { trialModelsUsed: string[]; isPro: boolean; userEmail: string }) {
+  trialModelsUsed, isPro, userEmail, accessToken,
+}: { trialModelsUsed: string[]; isPro: boolean; userEmail: string; accessToken: string }) {
   const bottomRef    = useRef<HTMLDivElement>(null)
   const [model,      setModel]    = useState("gpt-4o-mini")
   const [allMsgs,    setAllMsgs]  = useState<Record<string, Msg[]>>({})
@@ -96,7 +96,8 @@ function SessionsView({
     setLoading(true)
 
     const res  = await fetch("/api/chat", {
-      method: "POST", headers: { "Content-Type": "application/json" },
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${accessToken}` },
       body: JSON.stringify({ messages: updated, model }),
     })
     const data = await res.json()
@@ -807,13 +808,18 @@ export default function Dashboard() {
   const [connected,        setConnected]        = useState<Record<string, boolean>>({})
   const [unreadCount,      setUnreadCount]      = useState(MOCK_NOTIFS.filter(n => !n.read).length)
   const [sidebarOpen,      setSidebarOpen]      = useState(false)
+  const [accessToken,      setAccessToken]      = useState("")
 
   useEffect(() => {
-    supabase.auth.getUser().then(async ({ data: { user } }) => {
-      if (!user) { router.push("/login?next=/dashboard"); return }
-      setUserEmail(user.email ?? "")
-      const res = await fetch("/api/subscription/status")
-      const d   = await res.json()
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!session) { router.push("/login?next=/dashboard"); return }
+      const token = session.access_token
+      setAccessToken(token)
+      setUserEmail(session.user.email ?? "")
+      const res = await fetch("/api/subscription/status", {
+        headers: { "Authorization": `Bearer ${token}` },
+      })
+      const d = await res.json()
       setIsPro(d.status === "active")
       setTrialModelsUsed(d.trialModelsUsed ?? [])
       setAuthLoading(false)
@@ -988,7 +994,7 @@ export default function Dashboard() {
 
         {/* View content */}
         <div style={{ flex: 1, overflow: "hidden" }}>
-          {view === "sessions"     && <SessionsView trialModelsUsed={trialModelsUsed} isPro={isPro} userEmail={userEmail} />}
+          {view === "sessions"     && <SessionsView trialModelsUsed={trialModelsUsed} isPro={isPro} userEmail={userEmail} accessToken={accessToken} />}
           {view === "workflows"    && <WorkflowsView />}
           {view === "integrations" && <IntegrationsView connected={connected} setConnected={setConnected} />}
           {view === "compute"      && <ComputeView />}

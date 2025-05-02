@@ -7,6 +7,12 @@ import {
   Sparkles, Zap, Crown, Lock, Mail,
   RotateCcw, User, Bot, AlertCircle, Check, X, ArrowRight
 } from "lucide-react"
+import { createClient } from "@supabase/supabase-js"
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -161,24 +167,28 @@ function ChatContent() {
   const [selectedModel, setSelectedModel] = useState("gpt-4o-mini")
   const [showUpgrade,   setShowUpgrade]   = useState(false)
   const [sidebarOpen,   setSidebarOpen]   = useState(false)
+  const [accessToken,   setAccessToken]   = useState("")
 
   // Fetch subscription status on mount
   useEffect(() => {
-    fetch("/api/subscription/status")
-      .then(r => r.json())
-      .then(d => {
-        if (d.status === "unauthenticated") {
-          router.push("/login?next=/chat")
-          return
-        }
-        setSubState(d)
-        setSubLoading(false)
-        // If ?subscribed=true, refresh status
-        if (params.get("subscribed") === "true") {
-          setSubState(prev => prev ? { ...prev, status: "active" } : prev)
-        }
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) { router.push("/login?next=/chat"); return }
+      const token = session.access_token
+      setAccessToken(token)
+      fetch("/api/subscription/status", {
+        headers: { "Authorization": `Bearer ${token}` },
       })
-      .catch(() => setSubLoading(false))
+        .then(r => r.json())
+        .then(d => {
+          if (d.status === "unauthenticated") { router.push("/login?next=/chat"); return }
+          setSubState(d)
+          setSubLoading(false)
+          if (params.get("subscribed") === "true") {
+            setSubState(prev => prev ? { ...prev, status: "active" } : prev)
+          }
+        })
+        .catch(() => setSubLoading(false))
+    })
   }, [router, params])
 
   // Auto-scroll to bottom on new messages
@@ -203,7 +213,7 @@ function ChatContent() {
     try {
       const res  = await fetch("/api/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${accessToken}` },
         body: JSON.stringify({ messages: history, model: selectedModel }),
       })
       const data = await res.json()
