@@ -1,0 +1,107 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# Veil Research — Local LaTeX Compilation Service
+#
+# Starts a TexLive HTTP service that compiles LaTeX to PDF.
+# Required for live PDF preview and direct PDF export in Write Mode.
+#
+# SETUP:
+#   1. Install Docker Desktop: https://www.docker.com/products/docker-desktop
+#   2. Run: docker-compose -f docker-compose.latex.yml up -d
+#   3. Add to .env.local: LATEX_SERVICE_URL=http://localhost:3333
+#   4. Restart the Next.js dev server
+#
+# The service exposes POST /compile accepting:
+#   { "latex": "<main.tex content>", "bibliography": "<references.bib content>" }
+# Returns:
+#   { "success": true, "pdfBase64": "<base64 encoded PDF>" }
+#   { "success": false, "errors": [{ "message": "...", "line": 42 }] }
+# ──────────────────────────────────────────────────────────────────────────────
+
+version: "3.9"
+
+services:
+  latex-service:
+    image: texlive/texlive:latest
+    container_name: veil-latex
+    ports:
+      - "3333:3333"
+    volumes:
+      - latex_tmp:/tmp/latex-jobs
+    command: |
+      sh -c "
+        # Install Python + FastAPI for the HTTP wrapper
+        apt-get update -qq && apt-get install -y -qq python3 python3-pip &&
+        pip3 install -q fastapi uvicorn &&
+
+        # Write the compile server
+        cat > /tmp/server.py << 'PYEOF'
+import os, re, uuid, base64, subprocess, tempfile
+from fastapi import FastAPI
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class CompileRequest(BaseModel):
+    latex: str
+    bibliography: str = ''
+
+@app.post('/compile')
+def compile_latex(req: CompileRequest):
+    job_id = str(uuid.uuid4())
+    job_dir = f'/tmp/latex-jobs/{job_id}'
+    os.makedirs(job_dir, exist_ok=True)
+
+    # Write input files
+    with open(f'{job_dir}/main.tex', 'w') as f:
+        f.write(req.latex)
+    if req.bibliography:
+        with open(f'{job_dir}/references.bib', 'w') as f:
+            f.write(req.bibliography)
+
+    try:
+        # Run pdflatex twice + bibtex
+        for cmd in [
+            ['pdflatex', '-interaction=nonstopmode', '-output-directory', job_dir, f'{job_dir}/main.tex'],
+            ['bibtex', f'{job_dir}/main'],
+            ['pdflatex', '-interaction=nonstopmode', '-output-directory', job_dir, f'{job_dir}/main.tex'],
+            ['pdflatex', '-interaction=nonstopmode', '-output-directory', job_dir, f'{job_dir}/main.tex'],
+        ]:
+            subprocess.run(cmd, capture_output=True, timeout=60, cwd=job_dir)
+
+        pdf_path = f'{job_dir}/main.pdf'
+        if os.path.exists(pdf_path):
+            with open(pdf_path, 'rb') as f:
+                pdf_b64 = base64.b64encode(f.read()).decode()
+            return {'success': True, 'pdfBase64': pdf_b64, 'errors': []}
+        else:
+            # Parse errors from log
+            errors = []
+            log_path = f'{job_dir}/main.log'
+            if os.path.exists(log_path):
+                with open(log_path) as f:
+                    log = f.read()
+                for m in re.finditer(r'! (.+)\nl\.(\d+)', log):
+                    errors.append({'message': m.group(1), 'line': int(m.group(2))})
+                if not errors:
+                    for m in re.finditer(r'! (.+)', log):
+                        errors.append({'message': m.group(1), 'line': None})
+            return {'success': False, 'pdfBase64': None, 'errors': errors or [{'message': 'Compilation failed — no PDF generated', 'line': None}]}
+    finally:
+        # Cleanup
+        import shutil
+        shutil.rmtree(job_dir, ignore_errors=True)
+
+PYEOF
+
+        # Start the server
+        uvicorn /tmp/server:app --host 0.0.0.0 --port 3333
+      "
+    restart: unless-stopped
+
+volumes:
+  latex_tmp:
+
+# ── One-liner (no compose) ─────────────────────────────────────────────────────
+# docker run --rm -p 3333:3333 texlive/texlive:latest sh -c "..."
+# ──────────────────────────────────────────────────────────────────────────────

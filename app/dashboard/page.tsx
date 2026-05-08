@@ -4,6 +4,8 @@ import { useEffect, useRef, useState, lazy, Suspense } from "react"
 import { detectDomain, buildVisualPrompt, parseVisual } from "@/app/components/VisualPanel"
 import type { AnyViz } from "@/app/components/VisualPanel"
 const VisualPanel = lazy(() => import("@/app/components/VisualPanel"))
+import dynamic from "next/dynamic"
+const WriteModeView = dynamic(() => import("@/app/components/write/WriteModeView"), { ssr: false })
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
@@ -29,7 +31,7 @@ const supabase = createClient(
 )
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-type View = "sessions" | "workflows" | "integrations" | "compute" | "evaluations" | "papers" | "notebook" | "hypothesis" | "terminal" | "settings" | "notifications" | "profile" | "api-access" | "visuals"
+type View = "sessions" | "workflows" | "integrations" | "compute" | "evaluations" | "papers" | "notebook" | "hypothesis" | "terminal" | "settings" | "notifications" | "profile" | "api-access" | "visuals" | "write"
 type Msg  = { role: "user" | "assistant"; content: string }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -2759,6 +2761,7 @@ export default function Dashboard() {
 
   const NAV = [
     { id: "sessions",      label: "Sessions",     icon: Terminal       },
+    { id: "write",         label: "Write Mode",   icon: PenLine        },
     { id: "workflows",     label: "Workflows",    icon: Zap            },
     { id: "papers",        label: "Papers",       icon: Search         },
     { id: "notebook",      label: "Notebook",     icon: FileText       },
@@ -2948,6 +2951,7 @@ export default function Dashboard() {
         {/* View content */}
         <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
           {view === "sessions"     && <SessionsView trialModelsUsed={trialModelsUsed} isPro={isPro} userEmail={userEmail} accessToken={accessToken} starterPrompt={starterPrompt} onStarterConsumed={() => setStarterPrompt(undefined)} sessions={sessions} activeId={activeSessionId} onSetActiveId={setActiveSessionId} onCreateSession={dashCreateSession} onUpdateSessions={setSessions} />}
+          {view === "write"        && <WriteModeView accessToken={accessToken} />}
           {view === "workflows"    && <WorkflowsView onLaunch={(prompt) => { setStarterPrompt(prompt); setView("sessions") }} />}
           {view === "integrations" && <IntegrationsView connected={connected} setConnected={setConnected} />}
           {view === "compute"      && <ComputeView />}
